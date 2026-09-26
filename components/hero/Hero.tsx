@@ -1,5 +1,6 @@
 import { SITE } from "@/content/site";
 import { Reveal } from "@/components/motion/Reveal";
+import { HeroTechText } from "@/components/hero/HeroTechText";
 
 const LINES = ["BUILDING SYSTEMS", "THAT QUESTION", "THE ARCHITECTURE."];
 
@@ -13,13 +14,16 @@ export function Hero() {
 
       <div className="container-syn relative flex flex-1 flex-col justify-center pt-24 pb-16">
         <Reveal delay={0}>
-          <p className="mono mb-8 text-xs tracking-[0.35em] text-syn-cyan">
-            SYNEREOS
-          </p>
+          <div className="mb-4 h-[110px] w-full max-w-2xl md:h-[160px]">
+            <HeroTechText />
+          </div>
+          <h1 id="hero-title" className="sr-only">
+            SYNEREOS — Building systems that question the architecture.
+          </h1>
         </Reveal>
 
-        <h1
-          id="hero-title"
+        <div
+          aria-hidden="true"
           className="text-[clamp(2.75rem,8vw,8rem)] leading-[1.02] font-semibold tracking-tight text-syn-text"
         >
           {LINES.map((line, i) => (
@@ -27,7 +31,7 @@ export function Hero() {
               <span className="block">{line}</span>
             </Reveal>
           ))}
-        </h1>
+        </div>
 
         <Reveal delay={650}>
           <p className="mt-10 max-w-md text-base leading-relaxed text-syn-text-secondary md:text-lg">
