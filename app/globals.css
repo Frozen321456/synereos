@@ -40,6 +40,18 @@ body {
   overflow-x: hidden;
 }
 
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Everything horizontal-safe */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img, video, canvas, svg { max-width: 100%; height: auto; display: block; }
+
 ::selection { background: rgba(56, 189, 248, 0.25); }
 
 .mono { font-family: var(--font-jetbrains), ui-monospace, monospace; }
@@ -105,6 +117,30 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
 }
 .skip-link:focus { top: 16px; }
 
+/* React Bits overrides */
+.tech-text canvas { display: block; }
+.tech-text {
+  position: relative;
+  width: 100% !important;
+  max-width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  user-select: none;
+  overflow: hidden;
+}
+.tech-text .tech-text-canvas {
+  display: block;
+  width: 100% !important;
+  height: 100%;
+}
+.particle-text,
+.falling-text-container,
+.bento-section,
+.card-grid {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 /* Full-bleed effect layers */
 .fx-layer {
   position: absolute;
@@ -113,12 +149,53 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
   pointer-events: none;
   z-index: 0;
 }
-.fx-layer > * { width: 100% !important; height: 100% !important; }
+
+/* Ensure section fx-layer children don't overflow */
+.fx-layer > * {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100vw;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Mobile typography */
+@media (max-width: 768px) {
+  .container-syn { padding-inline: 20px; }
+  .tech-text { max-width: calc(100vw - 40px); }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container-syn { padding-inline: 32px; }
+}
+
+/* React Bits overrides for brand */
+.tech-text canvas { display: block; }
+
+/* Ensure all RB canvas containers don't overflow */
+.tech-text,
+.particle-text,
+.falling-text-container,
+.bento-section,
+.card-grid {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Typography scale: avoid unbreakable text */
+h1, h2, h3, h4, h5, h6 {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
 
 /* Section base */
 .syn-section {
   position: relative;
   isolation: isolate;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
 }
 
 /* Cinematic vignette edges */
