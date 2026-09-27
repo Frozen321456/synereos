@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { SITE } from "@/content/site";
+import { Preloader } from "@/components/providers/Preloader";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import "./globals.css";
 
@@ -58,7 +59,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             }),
           }}
         />
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
+        <Preloader />
       </body>
     </html>
   );
