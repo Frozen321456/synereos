@@ -1,38 +1,38 @@
-import { DOMAINS } from "@/content/domains";
-import { Reveal } from "@/components/motion/Reveal";
+"use client";
+
+import dynamic from "next/dynamic";
+import { RESEARCH_DOMAINS } from "@/content/research";
+
+const MagicBento = dynamic(() => import("@/components/react-bits/MagicBento"), { ssr: false });
 
 export function ResearchDomains() {
   return (
-    <section
-      className="section-pad border-t border-white/[0.06] bg-syn-surface"
-      aria-labelledby="domains-title"
-    >
+    <section id="research" className="syn-section section-pad border-t border-white/[0.06] bg-syn-surface" aria-labelledby="domains-title">
       <div className="container-syn">
-        <Reveal>
-          <h2
-            id="domains-title"
-            className="mono text-[11px] tracking-[0.3em] text-syn-text-muted"
-          >
-            RESEARCH DOMAINS
-          </h2>
-        </Reveal>
+        <p className="mono text-[11px] tracking-[0.3em] text-syn-text-muted">RESEARCH DOMAINS</p>
+        <h2 id="domains-title" className="mt-6 max-w-3xl text-[clamp(2rem,4.5vw,4rem)] leading-tight font-semibold tracking-tight text-syn-text">
+          Seven active fronts of inquiry.
+        </h2>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {DOMAINS.map((domain, i) => (
-            <Reveal key={domain.index} delay={i * 100}>
-              <article className="bento-card rounded-2xl border border-white/[0.06] bg-syn-surface-2 p-8 md:p-10">
-                <p className="mono text-[11px] tracking-[0.3em] text-syn-text-muted">
-                  {domain.index}
-                </p>
-                <h3 className="mt-6 text-2xl leading-snug font-medium tracking-tight text-syn-text md:text-[1.75rem]">
-                  {domain.title}
-                </h3>
-                <p className="mt-4 max-w-xs text-sm leading-relaxed text-syn-text-secondary">
-                  {domain.copy}
-                </p>
-              </article>
-            </Reveal>
-          ))}
+        <div className="mt-16">
+          <MagicBento
+            textAutoHide={false}
+            enableStars={true}
+            enableSpotlight={true}
+            enableBorderGlow={true}
+            enableTilt={true}
+            enableMagnetism={true}
+            clickEffect={true}
+            spotlightRadius={360}
+            particleCount={10}
+            glowColor="56, 189, 248"
+            cards={RESEARCH_DOMAINS.map((d) => ({
+              color: "#04060a",
+              title: d.title,
+              description: d.copy,
+              label: d.index,
+            }))}
+          />
         </div>
       </div>
     </section>

@@ -1,40 +1,46 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import { Reveal } from "@/components/motion/Reveal";
 
-const CONCEPTS = [
-  "Representation.",
-  "Memory.",
-  "Computation.",
-  "Runtime.",
-  "Adaptation.",
-];
+const TrueFocus = dynamic(() => import("@/components/react-bits/TrueFocus"), { ssr: false });
+const ParticleText = dynamic(() => import("@/components/react-bits/ParticleText"), { ssr: false });
+
+const CONCEPTS = ["Representation.", "Memory.", "Computation.", "Runtime.", "Adaptation."];
 
 export function ArchitectureQuestion() {
   return (
-    <section
-      className="section-pad border-t border-white/[0.06]"
-      aria-labelledby="question-title"
-    >
+    <section className="syn-section section-pad border-t border-white/[0.06]" aria-labelledby="question-title">
       <div className="container-syn">
         <Reveal>
-          <h2
-            id="question-title"
-            className="max-w-4xl text-[clamp(2.25rem,6vw,5rem)] leading-[1.12] font-medium tracking-tight text-syn-text"
-          >
-            What if the limitation isn&rsquo;t the model&mdash;but the
-            architecture around it?
-          </h2>
+          <div className="max-w-5xl">
+            <h2 id="question-title" className="sr-only">
+              What if the limitation isn't the model — but the architecture around it?
+            </h2>
+            <div aria-hidden="true" className="text-[clamp(2rem,5.5vw,5rem)] leading-[1.1] font-semibold tracking-tight text-syn-text">
+              <ParticleText
+                text="What if the limitation isn't the model — but the architecture around it?"
+                fontSize={64}
+                particleCount={4000}
+                particleSize={1.5}
+                particleColor="#F5F7FA"
+                backgroundColor="transparent"
+              />
+            </div>
+          </div>
         </Reveal>
         <Reveal delay={250}>
-          <ul className="mt-14 flex flex-wrap gap-x-8 gap-y-3">
-            {CONCEPTS.map((c) => (
-              <li
-                key={c}
-                className="mono text-[13px] tracking-[0.15em] text-syn-text-secondary"
-              >
-                {c}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-14">
+            <TrueFocus
+              sentence={CONCEPTS.join(" ")}
+              manualMode={false}
+              blurAmount={5}
+              borderColor="#38BDF8"
+              glowColor="rgba(56, 189, 248, 0.6)"
+              animationDuration={0.5}
+              pauseBetweenAnimations={1}
+            />
+          </div>
         </Reveal>
       </div>
     </section>

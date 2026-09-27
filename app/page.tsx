@@ -8,8 +8,11 @@ import { ResearchStatusSection } from "@/components/research/ResearchStatus";
 import { ResearchDomains } from "@/components/research/ResearchDomains";
 import { ResearchLog } from "@/components/research/ResearchLog";
 import { ArchitectureQuestion } from "@/components/sections/ArchitectureQuestion";
-import { BeyondHexim } from "@/components/sections/BeyondHexim";
+import { FailureArchive } from "@/components/sections/FailureArchive";
+import { Programs } from "@/components/sections/Programs";
+import { ResearchNotes } from "@/components/sections/ResearchNotes";
 import { OpenResearch } from "@/components/sections/OpenResearch";
+import { BeyondHexim } from "@/components/sections/BeyondHexim";
 import { FinalStatement } from "@/components/sections/FinalStatement";
 import { Footer } from "@/components/footer/Footer";
 
@@ -27,6 +30,9 @@ export default function Home() {
         <ResearchDomains />
         <ResearchLog />
         <ArchitectureQuestion />
+        <FailureArchive />
+        <Programs />
+        <ResearchNotes />
         <BeyondHexim />
         <OpenResearch />
         <FinalStatement />

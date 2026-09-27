@@ -1,17 +1,27 @@
 import { SITE } from "./site";
 
 export const HEXIM = {
-  eyebrow: "01 / FLAGSHIP RESEARCH",
+  eyebrow: "FLAGSHIP RESEARCH",
   title: "HEXIM",
-  subtitle: "Intelligence beyond parameters.",
-  copy: "Researching extreme efficiency, representation and on-device intelligence.",
+  subtitle: "Investigating intelligence as a closed loop, not an open pipeline.",
+  copy:
+    "HEXIM is Synereos' experimental architecture — a testbed for representation, memory, and experiential learning on constrained hardware.",
   cta: { label: "EXPLORE HEXIM →", href: SITE.heximRepo },
-  pillars: ["TERNARY BACKBONE", "VECTOR QUANTIZATION", "RUNTIME ARCHITECTURE"],
-  architecture: [
-    { id: "input", label: "INPUT" },
-    { id: "representation", label: "REPRESENTATION" },
-    { id: "ternary", label: "TERNARY BACKBONE" },
-    { id: "vq", label: "VECTOR QUANTIZATION" },
-    { id: "runtime", label: "RUNTIME" },
+  pillars: [
+    "REPRESENTATION",
+    "COMPRESSION",
+    "MEMORY",
+    "SKILL EVOLUTION",
+    "ON-DEVICE",
+  ],
+  experienceLoop: [
+    "Experience",
+    "Prediction",
+    "Surprise",
+    "Question",
+    "Experiment",
+    "Learning",
+    "Memory",
+    "Future prediction",
   ],
 } as const;
