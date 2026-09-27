@@ -2,9 +2,11 @@ import { Navbar } from "@/components/navigation/Navbar";
 import { Hero } from "@/components/hero/Hero";
 import { ResearchSignal } from "@/components/research/ResearchSignal";
 import { Thesis } from "@/components/sections/Thesis";
+import { PinnedStorySection } from "@/components/sections/PinnedStorySection";
 import { HeximFeature } from "@/components/hexim/HeximFeature";
 import { ArchitectureDiagram } from "@/components/hexim/ArchitectureDiagram";
 import { ResearchStatusSection } from "@/components/research/ResearchStatus";
+import { HorizontalCarousel } from "@/components/sections/HorizontalCarousel";
 import { ResearchDomains } from "@/components/research/ResearchDomains";
 import { ResearchLog } from "@/components/research/ResearchLog";
 import { ArchitectureQuestion } from "@/components/sections/ArchitectureQuestion";
@@ -24,17 +26,19 @@ export default function Home() {
         <Hero />
         <ResearchSignal />
         <Thesis />
+        <PinnedStorySection />
         <HeximFeature />
         <ArchitectureDiagram />
         <ResearchStatusSection />
+        <HorizontalCarousel />
         <ResearchDomains />
         <ResearchLog />
         <ArchitectureQuestion />
         <FailureArchive />
         <Programs />
         <ResearchNotes />
-        <BeyondHexim />
         <OpenResearch />
+        <BeyondHexim />
         <FinalStatement />
       </main>
       <Footer />
