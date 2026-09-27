@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText, SplitTextReveal } from "@/components/ui/SplitText";
+import { SplitText as SplitTextReact, SplitTextReveal } from "@/components/ui/SplitText";
 import { MagneticButton } from "@/components/ui/Magnetic";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -132,7 +132,7 @@ export function Hero() {
       }} />
 
       <div ref={contentRef} className="container-syn relative flex flex-1 flex-col justify-center pt-20 pb-16">
-        <SplitText
+        <SplitTextReact
           text="SYNEREOS"
           tag="h1"
           className="sr-only"
