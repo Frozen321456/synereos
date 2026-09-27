@@ -13,3 +13,17 @@ export const OPEN_RESEARCH = {
     { label: "Benchmark methodology", href: SITE.github },
   ],
 } as const;
+
+export const CONTACT = {
+  eyebrow: "COLLABORATE",
+  email: "research@synereos.com",
+  // Web3Forms/Resend/Supabase endpoint; empty = mailto fallback
+  endpoint: "",
+  interests: [
+    "Research Collaboration",
+    "Technical Discussion",
+    "Open-source Contribution",
+    "Experimental Partnership",
+    "Media / Research Inquiry",
+  ],
+} as const;

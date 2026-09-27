@@ -6,181 +6,89 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface SplitTextProps {
+type SplitMode = "lines" | "words" | "chars";
+
+function buildSplit(text: string, mode: SplitMode): string {
+  if (mode === "lines") {
+    return text
+      .split("\n")
+      .map((line) => `<div class="st-mask"><div class="st-line">${line.trim()}</div></div>`)
+      .join("");
+  }
+  if (mode === "words") {
+    return text
+      .split(" ")
+      .map(
+        (w) =>
+          `<span class="st-mask"><span class="st-line">${w}</span></span>`
+      )
+      .join(" ");
+  }
+  return text
+    .split("")
+    .map(
+      (c) =>
+        `<span class="st-mask"><span class="st-line">${c === " " ? "&nbsp;" : c}</span></span>`
+    )
+    .join("");
+}
+
+interface SplitHeadingProps {
   text: string;
-  tag?: "h1" | "h2" | "h3" | "p" | "span" | "div";
   className?: string;
-  style?: React.CSSProperties;
+  mode?: SplitMode;
   delay?: number;
   stagger?: number;
   duration?: number;
-  ease?: string;
-  from?: "lines" | "words" | "chars";
-  revealType?: "clip" | "fade" | "slide";
+  as?: "h1" | "h2" | "h3" | "div";
 }
 
-export function SplitText({
+/**
+ * Splits visible text into masked lines/words/chars and reveals them with a
+ * staggered rise. Accessible text stays intact in SSR HTML — splitting happens
+ * after mount and aria-label carries the full text.
+ */
+export function SplitHeading({
   text,
-  tag = "h1",
   className = "",
-  style,
+  mode = "lines",
   delay = 0,
-  stagger = 0.08,
-  duration = 1.2,
-  ease = "power3.out",
-  from = "lines",
-  revealType = "clip",
-}: SplitTextProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  stagger = 0.09,
+  duration = 1.1,
+  as = "h2",
+}: SplitHeadingProps) {
+  const ref = useRef<HTMLHeadingElement>(null);
+  const Tag = as;
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    const original = el.textContent || "";
+    el.innerHTML = buildSplit(original, mode);
+    el.setAttribute("aria-label", original);
 
-    const splitType = from;
-    let innerHTML = text;
-
-    if (splitType === "lines") {
-      innerHTML = text
-        .split("\n")
-        .map((line) => `<div class="split-line" style="overflow:hidden">${line}</div>`)
-        .join("");
-    } else if (splitType === "words") {
-      const words = text.split(" ");
-      innerHTML = words
-        .map((word) => `<span class="split-word" style="display:inline-block; overflow:hidden">${word}</span>`)
-        .join(" ");
-    } else if (splitType === "chars") {
-      innerHTML = text
-        .split("")
-        .map((char) => `<span class="split-char" style="display:inline-block; overflow:hidden">${char === " " ? "&nbsp;" : char}</span>`)
-        .join("");
-    }
-
-    el.innerHTML = innerHTML;
-
-    const targets = splitType === "lines" 
-      ? el.querySelectorAll(".split-line") 
-      : splitType === "words"
-        ? el.querySelectorAll(".split-word")
-        : el.querySelectorAll(".split-char");
-
-    gsap.set(targets, { 
-      opacity: revealType === "fade" ? 0 : 1,
-      y: revealType === "slide" ? 100 : 0,
-      clipPath: revealType === "clip" ? "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" : "none"
-    });
-
-    gsap.to(targets, {
-      opacity: 1,
-      y: 0,
-      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+    const lines = el.querySelectorAll(".st-line");
+    gsap.set(lines, { yPercent: 110 });
+    gsap.to(lines, {
+      yPercent: 0,
       duration,
-      ease,
+      ease: "power4.out",
       stagger,
       delay,
-      scrollTrigger: {
-        trigger: el,
-        start: "top 85%",
-        toggleActions: "play none none reverse",
-      },
+      scrollTrigger: { trigger: el, start: "top 88%", once: true },
     });
-  }, [text, delay, stagger, duration, ease, from, revealType]);
+
+    return () => {
+      el.innerHTML = original;
+      el.removeAttribute("aria-label");
+    };
+  }, [text, mode, delay, stagger, duration]);
 
   return (
-    <div ref={ref} className={className} style={style} aria-hidden="true">
+    <Tag ref={ref} className={className} aria-label={text}>
       {text}
-    </div>
-  );
-}
-
-export function SplitTextReveal({
-  children,
-  className = "",
-  style,
-  delay = 0,
-  stagger = 0.08,
-  duration = 1.2,
-  ease = "power3.out",
-  from = "lines",
-  revealType = "clip",
-}: {
-  children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  delay?: number;
-  stagger?: number;
-  duration?: number;
-  ease?: string;
-  from?: "lines" | "words" | "chars";
-  revealType?: "clip" | "fade" | "slide";
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
-
-    const text = el.textContent || "";
-    const splitType = from;
-    let innerHTML = "";
-
-    if (splitType === "lines") {
-      innerHTML = text
-        .split("\n")
-        .map((line) => `<div class="split-line" style="overflow:hidden">${line.trim()}</div>`)
-        .join("");
-    } else if (splitType === "words") {
-      innerHTML = text
-        .split(" ")
-        .map((word) => `<span class="split-word" style="display:inline-block; overflow:hidden">${word}</span>`)
-        .join(" ");
-    } else {
-      innerHTML = text
-        .split("")
-        .map((char) => `<span class="split-char" style="display:inline-block; overflow:hidden">${char === " " ? "&nbsp;" : char}</span>`)
-        .join("");
-    }
-
-    el.innerHTML = innerHTML;
-
-    const targets = splitType === "lines" 
-      ? el.querySelectorAll(".split-line") 
-      : splitType === "words"
-        ? el.querySelectorAll(".split-word")
-        : el.querySelectorAll(".split-char");
-
-    gsap.set(targets, { 
-      opacity: revealType === "fade" ? 0 : 1,
-      y: revealType === "slide" ? 100 : 0,
-      clipPath: revealType === "clip" ? "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" : "none"
-    });
-
-    gsap.to(targets, {
-      opacity: 1,
-      y: 0,
-      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-      duration,
-      ease,
-      stagger,
-      delay,
-      scrollTrigger: {
-        trigger: el,
-        start: "top 85%",
-        toggleActions: "play none none reverse",
-      },
-    });
-  }, [delay, stagger, duration, ease, from, revealType]);
-
-  return (
-    <div ref={ref} className={className} style={style} aria-hidden="true">
-      {children}
-    </div>
+    </Tag>
   );
 }

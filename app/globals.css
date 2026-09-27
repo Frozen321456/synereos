@@ -278,6 +278,18 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
 }
 
+/* SplitHeading mask reveal */
+.st-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.st-mask .st-line {
+  display: inline-block;
+  will-change: transform;
+}
+div.st-mask { display: block; }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

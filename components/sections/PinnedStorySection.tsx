@@ -3,168 +3,160 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitTextReveal } from "@/components/ui/SplitText";
+import { SplitHeading } from "@/components/ui/SplitText";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface PinnedStoryItem {
-  id: string;
-  number: string;
-  title: string;
-  description: string;
-  imageUrl?: string;
-}
-
-const STORY_ITEMS: PinnedStoryItem[] = [
+const STORY = [
   {
     id: "01",
-    number: "01",
-    title: "Question Everything",
-    description: "We don't optimize the obvious. We investigate what architecture could look like when assumptions are questioned at the foundation.",
+    title: "Question the architecture",
+    body: "We don't optimize the obvious. We investigate what intelligence could look like when its assumptions are questioned at the foundation.",
+    metric: "01 / THESIS",
   },
   {
     id: "02",
-    number: "02",
-    title: "Closed Loop Intelligence",
-    description: "HEXIM closes the loop: experience → prediction → surprise → question → experiment → learning → memory → future prediction.",
+    title: "Close the loop",
+    body: "HEXIM treats intelligence as a cycle: experience → prediction → surprise → question → experiment → learning → memory → future prediction.",
+    metric: "02 / HEXIM",
   },
   {
     id: "03",
-    number: "03",
-    title: "Efficiency as Architecture",
-    description: "Not post-hoc compression. Representation, memory, and runtime designed together from day one for constrained hardware.",
+    title: "Efficiency by design",
+    body: "Not post-hoc compression. Representation, memory, and runtime designed together from day one for constrained hardware.",
+    metric: "03 / EVIDENCE",
   },
   {
     id: "04",
-    number: "04",
-    title: "Failure as Data",
-    description: "Failed experiments, degraded layers, and rejected hypotheses are part of the record — not hidden, but analyzed for signal.",
+    title: "Failure is data",
+    body: "Failed experiments, degraded layers, and rejected hypotheses are part of the record — visible, analyzed, and fed into the next question.",
+    metric: "04 / METHOD",
   },
 ];
 
 export function PinnedStorySection() {
-  const pinRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    const root = rootRef.current;
+    const media = mediaRef.current;
+    if (!root || !media) return;
 
-    const pinEl = pinRef.current;
-    const contentEl = contentRef.current;
-    if (!pinEl || !contentEl) return;
+    const mm = gsap.matchMedia();
 
-    const ctx = gsap.context(() => {
-      // Pin the left column
-      ScrollTrigger.create({
-        trigger: pinEl,
-        start: "top top",
-        end: "bottom bottom",
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-      });
-
-      // Animate story items on scroll
-      STORY_ITEMS.forEach((item, index) => {
-        const itemEl = document.getElementById(`story-${item.id}`);
-        if (!itemEl) return;
-
+    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+      // Parallax offsets for the right-side card stream
+      const cards = media.querySelectorAll(".story-media");
+      cards.forEach((card, i) => {
+        const a = [14, 8, 14, 8][i % 4];
+        const b = [-8, -14, -8, -14][i % 4];
         gsap.fromTo(
-          itemEl,
-          { opacity: 0.3, y: 40, scale: 0.98 },
+          card,
+          { yPercent: a },
           {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.8,
-            ease: "power3.out",
+            yPercent: b,
+            ease: "none",
             scrollTrigger: {
-              trigger: itemEl,
-              start: "top 70%",
-              end: "top 30%",
-              scrub: 1,
-              toggleActions: "play reverse play reverse",
+              trigger: root,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1.2,
             },
-          } as gsap.TweenVars
+          }
         );
       });
 
-      // Right side parallax images
-      const images = contentEl.querySelectorAll(".story-image");
-      images.forEach((img, i) => {
-        gsap.to(img, {
-          yPercent: 30,
-          ease: "none",
-          scrollTrigger: {
-            trigger: pinEl,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1.5,
-          },
-        });
+      // Story items brighten as they pass the middle band
+      root.querySelectorAll(".story-item").forEach((item) => {
+        gsap.fromTo(
+          item,
+          { opacity: 0.35 },
+          {
+            opacity: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: item,
+              start: "top 75%",
+              end: "top 40%",
+              scrub: true,
+            },
+          }
+        );
       });
-    }, pinEl);
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
   return (
-    <section className="syn-section relative min-h-[200vh]" aria-labelledby="story-title">
-      <div className="container-syn">
-        <div ref={pinRef} className="relative grid lg:grid-cols-2 gap-16">
-          {/* Left: Pinned Content */}
-          <div ref={pinRef} className="lg:sticky lg:top-0 lg:h-[100vh] flex flex-col justify-center pr-12 lg:pr-20">
-            <div className="mb-16">
-              <span className="mono text-[11px] tracking-[0.3em] text-syn-text-muted">RESEARCH PHILOSOPHY</span>
-              <h2 id="story-title" className="mt-4 text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.05] font-semibold tracking-tight text-syn-text">
-                <SplitTextReveal 
-                  from="lines" 
-                  revealType="clip" 
-                  stagger={0.12}
-                  duration={1.4}
-                >
-                  How intelligence works<br />when the loop is closed.
-                </SplitTextReveal>
-              </h2>
-            </div>
+    <section
+      id="story"
+      ref={rootRef}
+      className="syn-section relative border-t border-white/[0.06]"
+      aria-labelledby="story-heading"
+    >
+      <div className="container-syn py-28 lg:py-40">
+        <p className="mono mb-8 text-[11px] tracking-[0.35em] text-syn-text-muted">
+          RESEARCH PHILOSOPHY
+        </p>
 
-            <div className="space-y-16" id="story-items">
-              {STORY_ITEMS.map((item) => (
-                <article 
-                  key={item.id} 
-                  id={`story-${item.id}`}
-                  className="group relative pl-8 border-l-2 border-white/[0.08] transition-all duration-500"
-                >
-                  <div className="absolute -left-3 top-2 w-4 h-4 rounded-full bg-white/[0.1] group-hover:bg-syn-cyan group-hover:scale-150 transition-all duration-500" />
-                  <span className="mono text-[11px] tracking-[0.2em] text-syn-cyan">{item.number}</span>
-                  <h3 className="mt-3 text-[clamp(1.5rem,3vw,2rem)] leading-tight font-medium tracking-tight text-syn-text">
+        <SplitHeading
+          as="h2"
+          text="How intelligence works when the loop is closed."
+          mode="lines"
+          stagger={0.12}
+          duration={1.3}
+          className="max-w-4xl text-[clamp(2.25rem,5.5vw,5rem)] leading-[1.04] font-semibold tracking-[-0.02em] text-syn-text"
+        />
+
+        <div className="mt-20 grid gap-16 lg:grid-cols-2 lg:gap-24">
+          {/* Left: sticky narrative highlights */}
+          <div className="lg:sticky lg:top-28 lg:h-fit">
+            <ol className="space-y-16">
+              {STORY.map((item) => (
+                <li key={item.id} className="story-item group">
+                  <span className="mono text-[10px] tracking-[0.3em] text-syn-cyan">
+                    {item.metric}
+                  </span>
+                  <h3 className="mt-3 text-2xl font-medium tracking-tight text-syn-text md:text-3xl">
                     {item.title}
                   </h3>
-                  <p className="mt-4 max-w-lg text-base leading-relaxed text-syn-text-secondary">
-                    {item.description}
+                  <p className="mt-4 max-w-md text-[15px] leading-relaxed text-syn-text-secondary">
+                    {item.body}
                   </p>
-                </article>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
 
-          {/* Right: Scrolling Visuals */}
-          <div ref={contentRef} className="relative space-y-12 lg:pr-0">
-            {STORY_ITEMS.map((item, i) => (
-              <div key={item.id} className="relative">
-                <div className="aspect-[4/3] rounded-xl overflow-hidden bg-syn-surface-2/50 border border-white/[0.06] story-image">
-                  <div className="absolute inset-0 bg-gradient-to-br from-syn-cyan/10 via-transparent to-syn-indigo/10" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="mono text-[10px] tracking-[0.3em] text-syn-text-muted/50">
-                      {item.title.toUpperCase()}
-                    </span>
-                  </div>
+          {/* Right: card stream with parallax */}
+          <div ref={mediaRef} className="space-y-10 lg:pt-24">
+            {STORY.map((item, i) => (
+              <figure key={item.id} className="story-media will-change-transform">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-white/[0.06] bg-syn-surface">
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage:
+                        i % 2 === 0
+                          ? "radial-gradient(ellipse 70% 60% at 30% 30%, rgba(56,189,248,0.10), transparent 65%)"
+                          : "radial-gradient(ellipse 70% 60% at 70% 70%, rgba(99,102,241,0.10), transparent 65%)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+                      backgroundSize: "48px 48px",
+                    }}
+                  />
+                  <span className="mono absolute bottom-4 left-4 text-[9px] tracking-[0.3em] text-syn-text-muted">
+                    {item.metric}
+                  </span>
                 </div>
-                <p className="mt-4 mono text-[11px] tracking-[0.2em] text-syn-text-muted">
-                  {item.number} — {item.title}
-                </p>
-              </div>
+              </figure>
             ))}
           </div>
         </div>

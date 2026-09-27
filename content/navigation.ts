@@ -7,10 +7,9 @@ export interface NavLink {
 }
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "RESEARCH", href: "#research" },
-  { label: "HEXIM", href: "#hexim" },
-  { label: "EVIDENCE", href: "#evidence" },
+  { label: "STORY", href: "#story" },
   { label: "PROGRAMS", href: "#programs" },
-  { label: "ABOUT", href: "#about" },
+  { label: "RESEARCH", href: "#research" },
+  { label: "CONTACT", href: "#contact" },
   { label: "GITHUB", href: SITE.github, external: true },
 ];

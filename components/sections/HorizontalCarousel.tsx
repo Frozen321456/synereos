@@ -1,51 +1,50 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { MagneticButton } from "@/components/ui/Magnetic";
+import { SplitHeading } from "@/components/ui/SplitText";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface CarouselItem {
+interface ShowcaseItem {
   id: string;
   title: string;
   subtitle: string;
   category: string;
-  imageUrl?: string;
-  linkUrl?: string;
   tags: string[];
+  linkUrl: string;
 }
 
-const CAROUSEL_ITEMS: CarouselItem[] = [
+const ITEMS: ShowcaseItem[] = [
   {
     id: "hexim",
     title: "HEXIM",
-    subtitle: "Flagship experiential intelligence architecture",
+    subtitle: "Flagship experiential intelligence architecture.",
     category: "ACTIVE RESEARCH",
     tags: ["Representation", "Memory", "On-Device"],
-    linkUrl: "#hexim",
+    linkUrl: "#research",
   },
   {
     id: "tfsr",
     title: "TFSR",
-    subtitle: "Experimental learning and representation research",
+    subtitle: "Experimental learning and representation research.",
     category: "EXPERIMENTAL",
     tags: ["Learning", "Representation"],
-    linkUrl: "#programs",
+    linkUrl: "#research",
   },
   {
     id: "jev-mobile",
     title: "JEV-MOBILE",
-    subtitle: "Compact structured decision intelligence",
+    subtitle: "Compact structured decision intelligence for mobile environments.",
     category: "EXPERIMENTAL",
     tags: ["Decision", "Mobile"],
-    linkUrl: "#programs",
+    linkUrl: "#research",
   },
   {
-    id: "efficient-ai",
+    id: "efficient",
     title: "EFFICIENT INTELLIGENCE",
-    subtitle: "Same reasoning under hard compute ceilings",
+    subtitle: "Same reasoning under hard compute ceilings.",
     category: "DOMAIN",
     tags: ["Compute", "Memory"],
     linkUrl: "#research",
@@ -53,137 +52,148 @@ const CAROUSEL_ITEMS: CarouselItem[] = [
   {
     id: "world-models",
     title: "WORLD MODELS",
-    subtitle: "Internal simulators for prediction and planning",
+    subtitle: "Internal simulators for prediction and planning.",
     category: "DOMAIN",
     tags: ["Planning", "Simulation"],
     linkUrl: "#research",
   },
   {
-    id: "autonomous",
+    id: "discovery",
     title: "AUTONOMOUS DISCOVERY",
-    subtitle: "Systems that generate and test hypotheses",
+    subtitle: "Systems that generate and test their own hypotheses.",
     category: "DOMAIN",
     tags: ["Agents", "Discovery"],
     linkUrl: "#research",
   },
 ];
 
-export function HorizontalCarousel() {
+export function ShowcaseCarousel() {
+  const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
-
+    const section = sectionRef.current;
     const track = trackRef.current;
-    if (!track) return;
+    if (!section || !track) return;
 
-    const ctx = gsap.context(() => {
-      const cards = track.querySelectorAll(".carousel-card");
-      
-      // Horizontal scroll scrub
-      gsap.to(cards, {
-        xPercent: -100 * (CAROUSEL_ITEMS.length - 1),
+    const mm = gsap.matchMedia();
+
+    // Desktop: pin + horizontal scrub. Mobile: native swipe (overflow-x-auto).
+    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+      const getDistance = () => track.scrollWidth - window.innerWidth;
+
+      const tween = gsap.to(track, {
+        x: () => -getDistance(),
         ease: "none",
         scrollTrigger: {
-          trigger: track,
-          start: "top center",
-          end: () => `+=${track.scrollWidth - window.innerWidth}`,
+          trigger: section,
+          start: "top top",
+          end: () => `+=${getDistance()}`,
           scrub: 1,
           pin: true,
-          pinSpacing: true,
           anticipatePin: 1,
-          onUpdate: (self) => {
-            setIsScrolling(self.progress > 0 && self.progress < 1);
-          },
+          invalidateOnRefresh: true,
         },
       });
 
-      // Card entrance animations
-      gsap.from(cards, {
-        opacity: 0,
-        y: 60,
-        scale: 0.9,
-        duration: 1,
-        ease: "power3.out",
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: track,
-          start: "top 80%",
-        },
-      });
-    }, track);
+      return () => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+        gsap.set(track, { x: 0 });
+      };
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
   return (
-    <section className="syn-section relative" aria-labelledby="carousel-title">
-      <div className="container-syn">
-        <div className="mb-16">
-          <span className="mono text-[11px] tracking-[0.3em] text-syn-text-muted">PROGRAMS & DOMAINS</span>
-          <h2 id="carousel-title" className="mt-4 text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.05] font-semibold tracking-tight text-syn-text">
-            Scroll to explore
-          </h2>
-        </div>
+    <section
+      id="programs"
+      ref={sectionRef}
+      className="syn-section relative border-t border-white/[0.06] bg-syn-surface overflow-hidden"
+      aria-labelledby="showcase-heading"
+    >
+      <div className="container-syn pt-28 pb-14 lg:pt-36">
+        <p className="mono mb-8 text-[11px] tracking-[0.35em] text-syn-text-muted">
+          PROGRAMS & DOMAINS
+        </p>
+        <SplitHeading
+          as="h2"
+          text="One lab. Many directions."
+          mode="lines"
+          stagger={0.1}
+          className="text-[clamp(2.25rem,5vw,4.5rem)] leading-[1.05] font-semibold tracking-[-0.02em] text-syn-text"
+        />
+      </div>
 
-        <div 
-          ref={trackRef} 
-          className="relative flex gap-8 pb-20 overflow-hidden"
-          style={{ width: "max-content" }}
+      {/* Horizontal track: pinned scrub on desktop, native swipe on mobile */}
+      <div className="lg:h-[62vh] lg:flex lg:items-center">
+        <div
+          ref={trackRef}
+          className="flex gap-6 overflow-x-auto px-[max(20px,4vw)] pb-10 lg:overflow-visible lg:pb-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {CAROUSEL_ITEMS.map((item, index) => (
+          {ITEMS.map((item) => (
             <article
               key={item.id}
-              className="carousel-card relative flex-shrink-0 w-[380px] lg:w-[420px]"
-              style={{ flexShrink: 0 }}
+              className="group relative w-[78vw] max-w-[420px] shrink-0 lg:w-[420px]"
             >
-              {/* Card Background */}
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-syn-surface-2/50 border border-white/[0.06] transition-all duration-500 group-hover:border-syn-cyan/50 group-hover:shadow-[0_0_40px_rgba(56,189,248,0.1)]">
-                <div className="absolute inset-0 bg-gradient-to-br from-syn-cyan/5 via-transparent to-syn-indigo/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="mono text-[10px] tracking-[0.3em] text-syn-text-muted/50">
+              <a href={item.linkUrl} className="block rounded-xl border border-white/[0.07] bg-syn-surface-2/60 transition-all duration-500 hover:-translate-y-2 hover:border-syn-cyan/40 hover:bg-syn-surface-2">
+                {/* Media */}
+                <div className="relative aspect-[16/11] overflow-hidden rounded-t-xl">
+                  <div
+                    className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                    style={{
+                      backgroundImage:
+                        "radial-gradient(ellipse 80% 70% at 30% 30%, rgba(56,189,248,0.10), transparent 60%), radial-gradient(ellipse 70% 60% at 80% 80%, rgba(99,102,241,0.09), transparent 60%)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-25"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+                      backgroundSize: "40px 40px",
+                    }}
+                  />
+                  <span className="mono absolute left-4 top-4 rounded-full border border-white/[0.12] bg-black/40 px-3 py-1 text-[9px] tracking-[0.2em] text-syn-text-secondary backdrop-blur-sm">
                     {item.category}
                   </span>
                 </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="mt-6 space-y-4">
-                <span className="mono text-[10px] tracking-[0.25em] text-syn-cyan">{item.category}</span>
-                <h3 className="text-[clamp(1.5rem,2.5vw,2rem)] leading-tight font-semibold tracking-tight text-syn-text">
-                  {item.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-syn-text-secondary">{item.subtitle}</p>
-                
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {item.tags.map((tag) => (
-                    <span key={tag} className="mono text-[10px] tracking-[0.15em] px-3 py-1 border border-white/[0.08] rounded-full text-syn-text-muted/80 hover:text-syn-cyan hover:border-syn-cyan/50 transition-colors">
-                      {tag}
-                    </span>
-                  ))}
+                {/* Content */}
+                <div className="p-7">
+                  <h3 className="text-2xl font-semibold tracking-tight text-syn-text transition-transform duration-500 group-hover:-translate-y-0.5">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-syn-text-secondary">
+                    {item.subtitle}
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {item.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="mono rounded-full border border-white/[0.09] px-3 py-1 text-[9px] tracking-[0.15em] text-syn-text-muted transition-colors group-hover:border-syn-cyan/40 group-hover:text-syn-text-secondary"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-
-                {item.linkUrl && (
-                  <MagneticButton
-                    onClick={() => {}}
-                    className="mt-4 inline-flex items-center gap-2 mono text-[11px] tracking-[0.2em] text-syn-text-secondary hover:text-syn-text transition-colors"
-                  >
-                    EXPLORE
-                    <span className="transition-transform group-hover:translate-x-1">→</span>
-                  </MagneticButton>
-                )}
-              </div>
+              </a>
             </article>
           ))}
 
-          {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-syn-text-muted/50">
-            <span className="mono text-[10px] tracking-[0.2em]">SCROLL HORIZONTALLY</span>
-            <div className="w-px h-12 bg-gradient-to-b from-syn-cyan/50 to-transparent animate-pulse" />
-          </div>
+          {/* End spacer card */}
+          <div className="hidden w-24 shrink-0 lg:block" aria-hidden="true" />
         </div>
+      </div>
+
+      <div className="container-syn pb-16 lg:pb-24">
+        <p className="mono hidden text-[10px] tracking-[0.3em] text-syn-text-muted lg:block">
+          KEEP SCROLLING — THE SECTION MOVES SIDEWAYS →
+        </p>
+        <p className="mono text-[10px] tracking-[0.3em] text-syn-text-muted lg:hidden">
+          SWIPE TO EXPLORE →
+        </p>
       </div>
     </section>
   );
