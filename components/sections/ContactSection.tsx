@@ -92,6 +92,7 @@ export function ContactSection() {
           </p>
           <SplitHeading
             as="h2"
+            id="contact-heading"
             text="Research with us."
             mode="lines"
             stagger={0.1}

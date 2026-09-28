@@ -119,6 +119,7 @@ export function ShowcaseCarousel() {
         </p>
         <SplitHeading
           as="h2"
+          id="showcase-heading"
           text="One lab. Many directions."
           mode="lines"
           stagger={0.1}

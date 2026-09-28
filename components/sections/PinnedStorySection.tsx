@@ -103,6 +103,7 @@ export function PinnedStorySection() {
 
         <SplitHeading
           as="h2"
+          id="story-heading"
           text="How intelligence works when the loop is closed."
           mode="lines"
           stagger={0.12}

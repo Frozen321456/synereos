@@ -97,6 +97,7 @@ export function Hero() {
 
         <SplitHeading
           as="h1"
+          id="hero-heading"
           text={"From answering\nquestions to\ninvestigating them."}
           mode="lines"
           delay={0.25}

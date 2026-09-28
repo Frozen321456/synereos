@@ -61,6 +61,7 @@ export function ResearchGrid() {
         </p>
         <SplitHeading
           as="h2"
+          id="grid-heading"
           text="Seven directions. One method: measure, fail, learn."
           mode="lines"
           stagger={0.11}

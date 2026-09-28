@@ -41,6 +41,7 @@ interface SplitHeadingProps {
   stagger?: number;
   duration?: number;
   as?: "h1" | "h2" | "h3" | "div";
+  id?: string;
 }
 
 /**
@@ -56,6 +57,7 @@ export function SplitHeading({
   stagger = 0.09,
   duration = 1.1,
   as = "h2",
+  id,
 }: SplitHeadingProps) {
   const ref = useRef<HTMLHeadingElement>(null);
   const Tag = as;
@@ -87,7 +89,7 @@ export function SplitHeading({
   }, [text, mode, delay, stagger, duration]);
 
   return (
-    <Tag ref={ref} className={className} aria-label={text}>
+    <Tag ref={ref} className={className} aria-label={text} {...(id ? { id } : {})}>
       {text}
     </Tag>
   );
