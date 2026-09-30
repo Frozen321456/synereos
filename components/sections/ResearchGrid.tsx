@@ -52,6 +52,7 @@ function StarBackground() {
           count={0}
           itemSize={3}
           array={new Float32Array(0)}
+          args={[new Float32Array(0), 3]}
         />
       </bufferGeometry>
       <pointsMaterial

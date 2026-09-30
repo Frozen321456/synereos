@@ -1,9 +1,12 @@
 import { Navbar } from "@/components/navigation/Navbar";
 import { Hero } from "@/components/hero/Hero";
-import { PinnedStorySection } from "@/components/sections/PinnedStorySection";
-import { ShowcaseCarousel } from "@/components/sections/HorizontalCarousel";
-import { ResearchGrid } from "@/components/sections/ResearchGrid";
-import { ContactSection } from "@/components/sections/ContactSection";
+import { QuestionSection } from "@/components/sections/QuestionSection";
+import { HeximFlagship } from "@/components/hexim/HeximFlagship";
+import { HeximCore } from "@/components/hexim/HeximCore";
+import { HeximArchitecture } from "@/components/hexim/HeximArchitecture";
+import { UnifiedModel } from "@/components/hexim/UnifiedModel";
+import { HeximInfinity } from "@/components/hexim/HeximInfinity";
+import { ResearchSection } from "@/components/research/ResearchSection";
 import { Footer } from "@/components/footer/Footer";
 
 export default function Home() {
@@ -12,10 +15,13 @@ export default function Home() {
       <Navbar />
       <main id="main">
         <Hero />
-        <PinnedStorySection />
-        <ShowcaseCarousel />
-        <ResearchGrid />
-        <ContactSection />
+        <QuestionSection />
+        <HeximFlagship />
+        <HeximCore />
+        <HeximArchitecture />
+        <UnifiedModel />
+        <HeximInfinity />
+        <ResearchSection />
       </main>
       <Footer />
     </>

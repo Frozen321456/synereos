@@ -7,9 +7,15 @@ export interface NavLink {
 }
 
 export const NAV_LINKS: NavLink[] = [
-  { label: "STORY", href: "#story" },
-  { label: "PROGRAMS", href: "#programs" },
-  { label: "RESEARCH", href: "#research" },
-  { label: "CONTACT", href: "#contact" },
-  { label: "GITHUB", href: SITE.github, external: true },
+  { label: "Research", href: "#research" },
+  { label: "HEXIM", href: "#hexim" },
+  { label: "Architecture", href: "#architecture" },
+  { label: "Experiments", href: "#experiments" },
+  { label: "Applications", href: "#applications" },
+  { label: "Lab", href: "#lab" },
+  { label: "Journal", href: "#journal" },
+  { label: "About", href: "#about" },
+  { label: "GitHub", href: SITE.github, external: true },
 ];
+
+export const HEXIM_CTA: NavLink = { label: "Explore HEXIM →", href: "#hexim", external: false };

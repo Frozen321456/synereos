@@ -1,81 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useLayoutEffect } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitHeading } from "@/components/ui/SplitText";
 import { MagneticButton } from "@/components/ui/Magnetic";
+import { HERO } from "@/content/hero";
 
 gsap.registerPlugin(ScrollTrigger);
 
 /* ──────────────────────────────────────────────
-   THREE: Particle Title — SYNEREOS
+   THREE: Particle System — Intelligence organizing
    ────────────────────────────────────────────── */
-function ParticleTitle() {
+function IntelligenceParticleSystem() {
   const ref = useRef<THREE.Points>(null);
   const particlesRef = useRef<Float32Array | null>(null);
   const originalPosRef = useRef<Float32Array | null>(null);
   const initialized = useRef(false);
 
-  // Build geometry programmatically - avoids JSX typing issues
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (initialized.current || !ref.current) return;
-    
-    // Generate points from text via canvas
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d")!;
-    canvas.width = 1024;
-    canvas.height = 256;
-    ctx.fillStyle = "white";
-    ctx.font = "bold 180px Inter, Arial, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("SYNEREOS", canvas.width / 2, canvas.height / 2);
-    
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const positions: number[] = [];
-    const step = 4;
-    for (let y = 0; y < canvas.height; y += step) {
-      for (let x = 0; x < canvas.width; x += step) {
-        const idx = (y * canvas.width + x) * 4;
-        if (imageData.data[idx + 3] > 128) {
-          // Normalize to -1..1 range
-          positions.push((x / canvas.width - 0.5) * 2.2);
-          positions.push(-(y / canvas.height - 0.5) * 0.6);
-          positions.push((Math.random() - 0.5) * 0.3);
-        }
-      }
-    }
-    
-    const geometry = new THREE.BufferGeometry();
-    const posArray = new Float32Array(positions);
-    geometry.setAttribute("position", new THREE.BufferAttribute(posArray, 3));
-    
-    // Random sizes for variation
-    const sizes = new Float32Array(posArray.length / 3);
-    for (let i = 0; i < sizes.length; i++) sizes[i] = Math.random() * 0.5 + 0.5;
-    geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
-    
-    // Store original positions for animation
-    const original = new Float32Array(posArray.length);
-    posArray.forEach((v, i) => { original[i] = v; });
+    const geometry = ref.current.geometry;
+    const position = geometry.getAttribute("position");
+    const count = position.count;
+    const original = new Float32Array(count * 3);
+    position.array.forEach((v, i) => { original[i] = v; });
     originalPosRef.current = original;
-    particlesRef.current = posArray;
-    
-    const material = new THREE.PointsMaterial({
-      size: 0.018,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.9,
-      color: 0x38BDF8,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    
-    ref.current.geometry = geometry;
-    ref.current.material = material;
+    particlesRef.current = position.array as Float32Array;
     initialized.current = true;
   }, []);
 
@@ -84,10 +37,16 @@ function ParticleTitle() {
     const t = performance.now() * 0.001;
     const positions = particlesRef.current;
     const original = originalPosRef.current;
+    // Subtle organization - particles drift toward structure
     for (let i = 0; i < positions.length; i += 3) {
-      positions[i] = original[i] + Math.sin(t * 0.7 + i * 0.01) * 0.008;
-      positions[i + 1] = original[i + 1] + Math.cos(t * 0.5 + i * 0.01) * 0.008;
-      positions[i + 2] = original[i + 2] + Math.sin(t * 0.3 + i * 0.01) * 0.006;
+      const noiseX = Math.sin(t * 0.3 + i * 0.01) * 0.02;
+      const noiseY = Math.cos(t * 0.2 + i * 0.01) * 0.02;
+      const noiseZ = Math.sin(t * 0.1 + i * 0.01) * 0.015;
+      // Gentle pull toward center over time
+      const organize = Math.min(t * 0.05, 0.3);
+      positions[i] = original[i] * (1 - organize) + noiseX;
+      positions[i + 1] = original[i + 1] * (1 - organize) + noiseY;
+      positions[i + 2] = original[i + 2] * (1 - organize) + noiseZ;
     }
     ref.current.geometry.attributes.position.needsUpdate = true;
   });
@@ -99,7 +58,7 @@ function ParticleTitle() {
         if (ref.current && particlesRef.current) {
           const pos = particlesRef.current;
           for (let i = 0; i < pos.length; i += 3) {
-            pos[i + 2] += 0.02;
+            pos[i + 2] += 0.03;
           }
           ref.current.geometry.attributes.position.needsUpdate = true;
         }
@@ -110,7 +69,34 @@ function ParticleTitle() {
           ref.current.geometry.attributes.position.needsUpdate = true;
         }
       }}
-    />
+    >
+      <bufferGeometry attach="geometry">
+        <bufferAttribute
+          attach="attributes-position"
+          count={0}
+          itemSize={3}
+          array={new Float32Array(0)}
+          args={[new Float32Array(0), 3]}
+        />
+        <bufferAttribute
+          attach="attributes-size"
+          count={0}
+          itemSize={1}
+          array={new Float32Array(0)}
+          args={[new Float32Array(0), 1]}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        attach="material"
+        size={0.018}
+        sizeAttenuation={true}
+        transparent
+        opacity={0.8}
+        color="#38BDF8"
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </points>
   );
 }
 
@@ -129,7 +115,7 @@ export function Hero() {
     const ctx = gsap.context(() => {
       if (bg) {
         gsap.to(bg, {
-          scale: 1.18,
+          scale: 1.15,
           ease: "none",
           scrollTrigger: {
             trigger: section,
@@ -146,18 +132,18 @@ export function Hero() {
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: 1.2,
           ease: "power3.out",
           stagger: 0.12,
-          delay: 0.9,
+          delay: 0.6,
         }
       );
 
-      gsap.fromTo(".hero-cue", { opacity: 0 }, { opacity: 1, duration: 1, delay: 1.6 });
+      gsap.fromTo(".hero-cue", { opacity: 0 }, { opacity: 1, duration: 1, delay: 1.8 });
       gsap.to(".hero-cue-bar", {
         scaleY: 0.2,
         transformOrigin: "top",
-        duration: 1.2,
+        duration: 1.4,
         ease: "power2.inOut",
         repeat: -1,
         yoyo: true,
@@ -170,23 +156,23 @@ export function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative flex h-svh min-h-[560px] flex-col overflow-hidden"
+      className="relative flex h-svh min-h-[600px] flex-col overflow-hidden"
       aria-labelledby="hero-heading"
     >
       <div ref={bgRef} className="absolute inset-0 -z-10" aria-hidden="true">
         <div
-          className="absolute inset-0 opacity-60"
+          className="absolute inset-0 opacity-50"
           style={{
             backgroundImage:
-              "radial-gradient(ellipse 90% 60% at 50% 0%, rgba(56,189,248,0.10), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 100%, rgba(99,102,241,0.08), transparent 60%)",
+              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(56,189,248,0.08), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 100%, rgba(99,102,241,0.06), transparent 60%)",
           }}
         />
         <div
-          className="absolute inset-0 opacity-[0.35]"
+          className="absolute inset-0 opacity-[0.3]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
-            backgroundSize: "96px 96px",
+              "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+            backgroundSize: "100px 100px",
             maskImage:
               "radial-gradient(ellipse 80% 65% at 50% 45%, black 25%, transparent 100%)",
             WebkitMaskImage:
@@ -195,55 +181,76 @@ export function Hero() {
         />
       </div>
 
-      <div className="container-syn relative flex flex-1 flex-col justify-end pb-14">
+      <div className="container-syn relative flex flex-1 flex-col justify-end pb-16 lg:pb-24">
         <p className="mono hero-fade text-[11px] tracking-[0.35em] text-syn-text-muted">
-          SYNEREOS — INDEPENDENT RESEARCH LAB
+          {HERO.eyebrow} — INDEPENDENT AI RESEARCH LAB
         </p>
 
-        <div className="mt-6 relative h-[120px] w-full max-w-5xl">
+        {/* THREE Particle System — Intelligence organizing */}
+        <div className="mt-8 relative h-[140px] w-full max-w-6xl">
           <Canvas
             camera={{ position: [0, 0, 2.5], fov: 35 }}
             gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
             style={{ width: "100%", height: "100%" }}
           >
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[1, 1, 2]} intensity={0.8} />
-            <ParticleTitle />
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[1, 1, 2]} intensity={0.7} />
+            <IntelligenceParticleSystem />
           </Canvas>
         </div>
 
         <SplitHeading
           as="h1"
           id="hero-heading"
-          text={"From answering\nquestions to\ninvestigating them."}
+          text={HERO.headline}
           mode="lines"
-          delay={0.25}
-          stagger={0.14}
+          delay={0.2}
+          stagger={0.12}
           duration={1.4}
-          className="mt-6 max-w-5xl text-[clamp(3rem,9vw,8.5rem)] leading-[0.98] font-semibold tracking-[-0.03em] text-syn-text"
+          className="mt-6 max-w-5xl text-[clamp(3rem,8vw,8.5rem)] leading-[0.98] font-semibold tracking-[-0.03em] text-syn-text"
         />
+
+        <p className="hero-fade mt-6 max-w-2xl text-base leading-relaxed text-syn-text-secondary">
+          {HERO.subtext}
+        </p>
 
         <div className="hero-fade mt-10 flex flex-wrap items-center gap-6">
           <MagneticButton className="mono cursor-pointer border border-white/20 text-[11px] tracking-[0.25em] text-syn-text transition-colors duration-300 hover:border-syn-cyan hover:text-syn-cyan">
-            <a href="#story" className="block px-8 py-4">
-              ENTER THE LAB
+            <a href={HERO.ctaPrimary.href} className="block px-8 py-4">
+              {HERO.ctaPrimary.label}
             </a>
           </MagneticButton>
           <a
-            href="#programs"
+            href={HERO.ctaSecondary.href}
             className="mono link-line text-[11px] tracking-[0.25em] text-syn-text-secondary transition-colors hover:text-syn-text"
           >
-            HEXIM →
+            {HERO.ctaSecondary.label}
           </a>
+        </div>
+
+        {/* Status bar */}
+        <div className="hero-fade mt-16 flex flex-wrap items-center gap-8 text-[12px] text-syn-text-muted">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-syn-cyan" aria-hidden="true" />
+            <span>{HERO.status.label}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span aria-hidden="true">/</span>
+            <span>{HERO.status.location}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span aria-hidden="true">/</span>
+            <span className="mono tracking-[0.15em]">{HERO.status.tags.join(" • ")}</span>
+          </div>
         </div>
       </div>
 
       <div
-        className="hero-cue pointer-events-none absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
+        className="hero-cue pointer-events-none absolute bottom-10 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
         aria-hidden="true"
       >
         <span className="mono text-[9px] tracking-[0.35em] text-syn-text-muted">SCROLL</span>
-        <div className="h-14 w-px overflow-hidden bg-white/[0.08]">
+        <div className="h-16 w-px overflow-hidden bg-white/[0.06]">
           <div className="hero-cue-bar h-full w-px bg-syn-cyan" />
         </div>
       </div>

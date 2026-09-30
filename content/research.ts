@@ -88,3 +88,11 @@ export const RESEARCH_DOMAINS: ResearchDomain[] = [
   { index: "06", title: "AUTONOMOUS DISCOVERY", copy: "Systems that generate and test their own hypotheses." },
   { index: "07", title: "ON-DEVICE INTELLIGENCE", copy: "Real inference on real hardware people own." },
 ];
+
+export const RESEARCH = {
+  eyebrow: "RESEARCH",
+  title: "Research Frontiers",
+  subtitle: "Seven directions. One method: measure, fail, learn.",
+  domains: RESEARCH_DOMAINS,
+  signals: RESEARCH_SIGNAL,
+} as const;
