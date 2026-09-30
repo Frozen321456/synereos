@@ -45,46 +45,98 @@ export function PinnedStorySection() {
 
     const mm = gsap.matchMedia();
 
-    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
-      // Parallax offsets for the right-side card stream
-      const cards = media.querySelectorAll(".story-media");
-      cards.forEach((card, i) => {
-        const a = [14, 8, 14, 8][i % 4];
-        const b = [-8, -14, -8, -14][i % 4];
-        gsap.fromTo(
-          card,
-          { yPercent: a },
-          {
-            yPercent: b,
-            ease: "none",
-            scrollTrigger: {
-              trigger: root,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1.2,
-            },
-          }
-        );
-      });
+    mm.add(
+      "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+      () => {
+        // Parallax offsets for the right-side card stream
+        const cards = media.querySelectorAll(".story-media");
+        cards.forEach((card, i) => {
+          const a = [14, 8, 14, 8][i % 4];
+          const b = [-8, -14, -8, -14][i % 4];
+          gsap.fromTo(
+            card,
+            { yPercent: a },
+            {
+              yPercent: b,
+              ease: "none",
+              scrollTrigger: {
+                trigger: root,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.2,
+              },
+            }
+          );
+        });
 
-      // Story items brighten as they pass the middle band
-      root.querySelectorAll(".story-item").forEach((item) => {
-        gsap.fromTo(
-          item,
-          { opacity: 0.35 },
-          {
-            opacity: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: item,
-              start: "top 75%",
-              end: "top 40%",
-              scrub: true,
-            },
-          }
-        );
-      });
-    });
+        // Story items brighten as they pass the middle band
+        root.querySelectorAll(".story-item").forEach((item) => {
+          gsap.fromTo(
+            item,
+            { opacity: 0.35 },
+            {
+              opacity: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: item,
+                start: "top 75%",
+                end: "top 40%",
+                scrub: true,
+              },
+            }
+          );
+        });
+
+        // Additional creativity: gentle float animation for story items (left side)
+        const storyItems = root.querySelectorAll(".story-item");
+        storyItems.forEach((item) => {
+          gsap.to(item, {
+            y: -10,
+            duration: 3,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+          });
+        });
+
+        // Additional creativity: tilt on hover for story media cards (right side)
+        cards.forEach((card) => {
+          gsap.set(card, { transformOrigin: "center" });
+          card.addEventListener("mousemove", (e) => {
+            const mouseEvent = e as MouseEvent;
+            const rect = card.getBoundingClientRect();
+            const x = mouseEvent.clientX - rect.left;
+            const y = mouseEvent.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const angleX = ((y - centerY) / centerY) * 5; // tilt up/down
+            const angleY = ((centerX - x) / centerX) * 5; // tilt left/right (inverted)
+            gsap.to(card, {
+              rotationX: angleX,
+              rotationY: angleY,
+              duration: 0.4,
+              ease: "power2.out",
+            });
+          });
+          card.addEventListener("mouseleave", () => {
+            gsap.to(card, {
+              rotationX: 0,
+              rotationY: 0,
+              duration: 0.6,
+              ease: "elastic.out(1, 0.3)",
+            });
+          });
+        });
+
+        return () => {
+          // Clean up event listeners if needed
+          cards.forEach((card) => {
+            card.removeEventListener("mousemove", () => {});
+            card.removeEventListener("mouseleave", () => {});
+          });
+        };
+      }
+    );
 
     return () => mm.revert();
   }, []);
@@ -135,7 +187,9 @@ export function PinnedStorySection() {
           <div ref={mediaRef} className="space-y-10 lg:pt-24">
             {STORY.map((item, i) => (
               <figure key={item.id} className="story-media will-change-transform">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-white/[0.06] bg-syn-surface">
+                <div
+                  className="relative aspect-[4/3] overflow-hidden rounded-lg border border-white/[0.06] bg-syn-surface"
+                >
                   <div
                     className="absolute inset-0"
                     style={{

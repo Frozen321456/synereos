@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitHeading } from "@/components/ui/SplitText";
@@ -8,22 +10,67 @@ import { RESEARCH_DOMAINS } from "@/content/research";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const STATUS_STYLE: Record<string, string> = {
-  COMPLETE: "text-emerald-300",
-  FAILED: "text-red-300",
-  INVESTIGATING: "text-amber-200",
-  ACTIVE: "text-syn-cyan",
-  INCONCLUSIVE: "text-amber-200",
-};
+/* ──────────────────────────────────────────────
+   THREE: Starfield Background
+   ────────────────────────────────────────────── */
+function StarBackground() {
+  const pointsRef = useRef<THREE.Points>(null);
+  const positionsRef = useRef<Float32Array | null>(null);
+  const count = 150;
 
-const GLYPH: Record<string, string> = {
-  COMPLETE: "✓",
-  FAILED: "✗",
-  INVESTIGATING: "◌",
-  ACTIVE: "◉",
-  INCONCLUSIVE: "~",
-};
+  useEffect(() => {
+    if (!pointsRef.current) return;
+    const geometry = pointsRef.current.geometry;
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 10; // x
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 10; // y
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 20; // z
+    }
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    positionsRef.current = positions;
+  }, []);
 
+  useFrame(() => {
+    if (!pointsRef.current || !positionsRef.current) return;
+    const positions = positionsRef.current;
+    // Slow drift
+    for (let i = 0; i < count; i++) {
+      positions[i * 3 + 1] += 0.01; // drift up
+      if (positions[i * 3 + 1] > 5) positions[i * 3 + 1] = -5;
+    }
+    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+  });
+
+  return (
+    <points
+      ref={pointsRef}
+    >
+      <bufferGeometry attach="geometry">
+        <bufferAttribute
+          attach="attributes-position"
+          count={0}
+          itemSize={3}
+          array={new Float32Array(0)}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        attach="material"
+        size={0.02}
+        sizeAttenuation={true}
+        transparent
+        opacity={0.6}
+        color="#38BDF8"
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </points>
+  );
+}
+
+/* ──────────────────────────────────────────────
+   RESEARCH GRID SECTION
+   ────────────────────────────────────────────── */
 export function ResearchGrid() {
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +102,20 @@ export function ResearchGrid() {
       className="syn-section relative border-t border-white/[0.06]"
       aria-labelledby="grid-heading"
     >
-      <div className="container-syn py-28 lg:py-40">
+      {/* Starfield background */}
+      <div className="absolute inset-0 -z-10" aria-hidden="true">
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 35 }}
+          gl={{ antialias: true, alpha: true }}
+          style={{ width: "100%", height: "100%" }}
+        >
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[1, 1, 2]} intensity={0.8} />
+          <StarBackground />
+        </Canvas>
+      </div>
+
+      <div className="container-syn relative py-28 lg:py-40">
         <p className="mono mb-8 text-[11px] tracking-[0.35em] text-syn-text-muted">
           RESEARCH FRONTIERS
         </p>
@@ -76,10 +136,13 @@ export function ResearchGrid() {
           {RESEARCH_DOMAINS.map((d, i) => (
             <article
               key={d.index}
-              className={`grid-cell group relative overflow-hidden rounded-xl border border-white/[0.07] bg-syn-surface/60 p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-syn-cyan/40 hover:bg-syn-surface ${
-                i === 0 || i === 5 ? "lg:row-span-1 min-h-[240px] lg:min-h-[280px]" : "min-h-[240px] lg:min-h-[280px]"
-              }`}
+              className={`grid-cell group relative overflow-hidden rounded-xl border border-white/[0.07] bg-syn-surface/60 p-8 transition-all duration-500 hover:-translate-y-2 hover:border-syn-cyan/40 hover:bg-syn-surface-2/80
+                ${i === 0 || i === 5 ? "lg:row-span-1 min-h-[240px] lg:min-h-[280px]" : "min-h-[240px] lg:min-h-[280px]"}`}
             >
+              {/* Optional: user image placeholder */}
+              {/* We can add an image here if provided, e.g., <img src={userImage} alt={d.title} className="..."> */}
+              {/* For now, we keep the abstract background via the cell's border and hover effects. */}
+              
               <div
                 className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 style={{

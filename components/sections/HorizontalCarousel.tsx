@@ -70,38 +70,59 @@ const ITEMS: ShowcaseItem[] = [
 export function ShowcaseCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
-    if (!section || !track) return;
+    const bg = bgRef.current;
+    if (!section || !track || !bg) return;
 
     const mm = gsap.matchMedia();
 
     // Desktop: pin + horizontal scrub. Mobile: native swipe (overflow-x-auto).
-    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
-      const getDistance = () => track.scrollWidth - window.innerWidth;
+    mm.add(
+      "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+      () => {
+        const getDistance = () => track.scrollWidth - window.innerWidth;
 
-      const tween = gsap.to(track, {
-        x: () => -getDistance(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: () => `+=${getDistance()}`,
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
-      });
+        const tween = gsap.to(track, {
+          x: () => -getDistance(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: () => "+=" + getDistance(),
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
 
-      return () => {
-        tween.scrollTrigger?.kill();
-        tween.kill();
-        gsap.set(track, { x: 0 });
-      };
-    });
+        // Background dot grid animation - slow drift
+        if (bg) {
+          const bgTween = gsap.to(bg, {
+            backgroundPosition: "+=100 +=100",
+            duration: 30,
+            ease: "none",
+            repeat: -1,
+          });
+          return () => {
+            tween.scrollTrigger?.kill();
+            tween.kill();
+            gsap.set(track, { x: 0 });
+            bgTween.kill();
+          };
+        }
+
+        return () => {
+          tween.scrollTrigger?.kill();
+          tween.kill();
+          gsap.set(track, { x: 0 });
+        };
+      }
+    );
 
     return () => mm.revert();
   }, []);
@@ -113,6 +134,18 @@ export function ShowcaseCarousel() {
       className="syn-section relative border-t border-white/[0.06] bg-syn-surface overflow-hidden"
       aria-labelledby="showcase-heading"
     >
+      {/* Moving dot grid background */}
+      <div
+        ref={bgRef}
+        className="absolute inset-0 -z-10" 
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+        aria-hidden="true"
+      />
+
       <div className="container-syn pt-28 pb-14 lg:pt-36">
         <p className="mono mb-8 text-[11px] tracking-[0.35em] text-syn-text-muted">
           PROGRAMS & DOMAINS
@@ -136,9 +169,9 @@ export function ShowcaseCarousel() {
           {ITEMS.map((item) => (
             <article
               key={item.id}
-              className="group relative w-[78vw] max-w-[420px] shrink-0 lg:w-[420px]"
+              className="group relative w-[78vw] max-w-[420px] shrink-0 lg:w-[420px] cursor-default"
             >
-              <a href={item.linkUrl} className="block rounded-xl border border-white/[0.07] bg-syn-surface-2/60 transition-all duration-500 hover:-translate-y-2 hover:border-syn-cyan/40 hover:bg-syn-surface-2">
+              <a href={item.linkUrl} className="block rounded-xl border border-white/[0.07] bg-syn-surface-2/60 transition-all duration-500 hover:-translate-y-4 hover:border-syn-cyan/40 hover:bg-syn-surface-2/80">
                 {/* Media */}
                 <div className="relative aspect-[16/11] overflow-hidden rounded-t-xl">
                   <div
