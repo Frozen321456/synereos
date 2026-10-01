@@ -1,68 +1,97 @@
-import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
-import { SITE } from "@/content/site";
-import { Preloader } from "@/components/providers/Preloader";
-import { SmoothScroll } from "@/components/providers/SmoothScroll";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Inter, JetBrains_Mono } from 'next/font/google';
+import './globals.css';
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+  preload: true,
 });
 
-const jetbrains = JetBrains_Mono({
-  variable: "--font-jetbrains",
-  subsets: ["latin"],
-  display: "swap",
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE.url),
-  title: SITE.title,
-  description: SITE.description,
-  alternates: { canonical: "/" },
+  title: 'Synereos — Independent AI Research Lab for New Intelligence Architectures',
+  description: 'Synereos is an independent technology research lab investigating how intelligence could emerge from representation, memory, and experience — not just scale.',
+  metadataBase: new URL('https://synereos.com'),
+  alternates: {
+    canonical: 'https://synereos.com',
+  },
   openGraph: {
-    title: SITE.title,
-    description: SITE.description,
-    url: SITE.url,
-    siteName: "Synereos",
-    type: "website",
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://synereos.com',
+    siteName: 'Synereos',
+    title: 'Synereos — Independent AI Research Lab for New Intelligence Architectures',
+    description: 'Synereos is an independent technology research lab investigating how intelligence could emerge from representation, memory, and experience — not just scale.',
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Synereos — Independent AI Research Lab',
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: SITE.title,
-    description: SITE.description,
+    card: 'summary_large_image',
+    title: 'Synereos — Independent AI Research Lab for New Intelligence Architectures',
+    description: 'Synereos is an independent technology research lab investigating how intelligence could emerge from representation, memory, and experience — not just scale.',
+    images: ['/og.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: '#FFFFFF',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrains.variable} antialiased`}>
-      <body className="min-h-dvh bg-syn-bg text-syn-text">
-        <a href="#main" className="skip-link mono text-xs">
-          SKIP TO CONTENT
-        </a>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="256x256" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Synereos",
-              url: SITE.url,
-              description: SITE.description,
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Synereos',
+              url: 'https://synereos.com',
+              description:
+                'Synereos is an independent technology research lab investigating how intelligence could emerge from representation, memory, and experience — not just scale.',
+              sameAs: [
+                'https://github.com/synereos',
+                'https://x.com/synereos',
+                'https://instagram.com/synereos',
+              ],
             }),
           }}
         />
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
-        <Preloader />
+      </head>
+      <body className="min-h-dvh bg-syn-bg text-syn-text">
+        <a href="#main" className="skip-link mono text-xs">
+          SKIP TO CONTENT
+        </a>
+        {children}
       </body>
     </html>
   );

@@ -1,304 +1,187 @@
 @import "tailwindcss";
 
-:root {
-  --syn-bg: #000000;
-  --syn-surface: #04060a;
-  --syn-surface-2: #0a0e14;
-  --syn-text: #f5f7fa;
-  --syn-text-secondary: #9aa4b2;
-  --syn-text-muted: #5e6877;
-  --syn-cyan: #38bdf8;
-  --syn-indigo: #6366f1;
-  --syn-border: rgba(255, 255, 255, 0.06);
-  --syn-border-strong: rgba(255, 255, 255, 0.14);
-  --syn-ease: cubic-bezier(0.22, 1, 0.36, 1);
-}
+@theme {
+  --color-syn-bg: #FFFFFF;
+  --color-syn-surface: #F8FAFC;
+  --color-syn-text: #0A0F1E;
+  --color-syn-text-secondary: #475569;
+  --color-syn-text-muted: #94A3B8;
+  --color-syn-cyan: #0284C7;
+  --color-syn-cyan-light: #38BDF8;
+  --color-syn-indigo: #4338CA;
+  --color-syn-indigo-light: #818CF8;
+  --color-syn-success: #059669;
+  --color-syn-error: #DC2626;
+  --color-syn-warning: #D97706;
+  --color-syn-info: #0284C7;
 
-@theme inline {
-  --color-syn-bg: var(--syn-bg);
-  --color-syn-surface: var(--syn-surface);
-  --color-syn-surface-2: var(--syn-surface-2);
-  --color-syn-text: var(--syn-text);
-  --color-syn-text-secondary: var(--syn-text-secondary);
-  --color-syn-text-muted: var(--syn-text-muted);
-  --color-syn-cyan: var(--syn-cyan);
-  --color-syn-indigo: var(--syn-indigo);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
-}
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-display: Inter, system-ui, sans-serif;
 
-html { scroll-behavior: auto; }
-html.lenis { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+  --animate-slide-up: slide-up 0.8s ease-out forwards;
+  --animate-scale-in: scale-in 0.5s ease-out forwards;
+  --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s ease-in-out infinite;
 
-body {
-  background: var(--syn-bg);
-  color: var(--syn-text);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  overflow-x: hidden;
-}
-
-html, body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-/* Everything horizontal-safe */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-img, video, canvas, svg { max-width: 100%; height: auto; display: block; }
-
-::selection { background: rgba(56, 189, 248, 0.25); }
-
-.mono { font-family: var(--font-jetbrains), ui-monospace, monospace; }
-
-.container-syn {
-  width: 100%;
-  max-width: 1440px;
-  margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 64px);
-  position: relative;
-  z-index: 2;
-}
-
-.section-pad {
-  padding-block: clamp(120px, 18vw, 260px);
-}
-
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.9s var(--syn-ease), transform 0.9s var(--syn-ease);
-  transition-delay: var(--reveal-delay, 0ms);
-}
-.reveal.is-visible { opacity: 1; transform: none; }
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
 }
 
-a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--syn-cyan);
-  outline-offset: 3px;
-  border-radius: 4px;
-}
-
-.link-line { position: relative; }
-.link-line::after {
-  content: "";
-  position: absolute; left: 0; bottom: -2px;
-  width: 100%; height: 1px;
-  background: currentColor;
-  transform: scaleX(0); transform-origin: right;
-  transition: transform 0.3s var(--syn-ease);
-}
-.link-line:hover::after, .link-line:focus-visible::after {
-  transform: scaleX(1); transform-origin: left;
-}
-
-.skip-link {
-  position: absolute;
-  top: -100px; left: 16px; z-index: 100;
-  padding: 10px 16px;
-  background: var(--syn-surface-2);
-  color: var(--syn-text);
-  border: 1px solid var(--syn-border-strong);
-  border-radius: 8px;
-  transition: top 0.2s var(--syn-ease);
-}
-.skip-link:focus { top: 16px; }
-
-/* React Bits overrides */
-.tech-text canvas { display: block; }
-.tech-text {
-  position: relative;
-  width: 100% !important;
-  max-width: 100%;
-  height: 100%;
-  touch-action: pan-y;
-  user-select: none;
-  overflow: hidden;
-}
-.tech-text .tech-text-canvas {
-  display: block;
-  width: 100% !important;
-  height: 100%;
-}
-.particle-text,
-.falling-text-container,
-.bento-section,
-.card-grid {
-  max-width: 100%;
-  overflow: hidden;
-}
-
-/* Full-bleed effect layers */
-.fx-layer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Ensure section fx-layer children don't overflow */
-.fx-layer > * {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100vw;
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-/* Mobile typography */
-@media (max-width: 768px) {
-  .container-syn { padding-inline: 20px; }
-  .tech-text { max-width: calc(100vw - 40px); }
-}
-@media (min-width: 769px) and (max-width: 1024px) {
-  .container-syn { padding-inline: 32px; }
-}
-
-/* React Bits overrides for brand */
-.tech-text canvas { display: block; }
-
-/* Ensure all RB canvas containers don't overflow */
-.tech-text,
-.particle-text,
-.falling-text-container,
-.bento-section,
-.card-grid {
-  max-width: 100%;
-  overflow: hidden;
-}
-
-/* Typography scale: avoid unbreakable text */
-h1, h2, h3, h4, h5, h6 {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-
-/* Section base */
-.syn-section {
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: clip;
-}
-
-/* Cinematic vignette edges */
-.vignette::before,
-.vignette::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0;
-  height: 80px;
-  z-index: 1;
-  pointer-events: none;
-}
-.vignette::before {
-  top: 0;
-  background: linear-gradient(to bottom, var(--syn-bg), transparent);
-}
-.vignette::after {
-  bottom: 0;
-  background: linear-gradient(to top, var(--syn-bg), transparent);
-}
-
-/* Navbar slide-down animation */
-@keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-100%);
+@layer base {
+  html {
+    scroll-behavior: smooth;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  body {
+    @apply bg-syn-bg text-syn-text font-sans antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    @apply bg-syn-cyan/20 text-syn-text;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-syn-cyan ring-offset-2 ring-offset-syn-bg;
   }
 }
 
-.animate-slide-down {
-  animation: slide-down 300ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Pulse animation for scroll indicator */
-@keyframes pulse {
-  0%, 100% { 
-    opacity: 0.5; 
-    transform: scaleY(1); 
+@layer components {
+  .mono {
+    @apply font-mono;
   }
-  50% { 
-    opacity: 1; 
-    transform: scaleY(0.5); 
+  .container-syn {
+    @apply mx-auto max-w-[1280px] px-6 lg:px-10;
+  }
+  .syn-section {
+    @apply relative py-20 lg:py-28;
+  }
+  .hairline-t {
+    @apply border-t border-black/[0.06];
+  }
+  .hairline-b {
+    @apply border-b border-black/[0.06];
+  }
+  .glass-panel {
+    @apply bg-white/55 backdrop-blur-md border border-white/75 shadow-[0_8px_32px_rgba(2,132,199,0.08)] rounded-2xl;
+  }
+  .glass-panel-hover {
+    @apply transition-all duration-500 hover:-translate-y-1 hover:border-syn-cyan/40 hover:bg-white/70 hover:shadow-[0_12px_40px_rgba(2,132,199,0.12)];
+  }
+  .link-line {
+    @apply relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-bottom-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100;
+  }
+  .btn-primary {
+    @apply font-mono rounded-full bg-syn-text px-8 py-4 text-[11px] tracking-[0.25em] text-white transition-all duration-300 hover:bg-syn-cyan;
+  }
+  .btn-secondary {
+    @apply font-mono text-[11px] tracking-[0.25em] text-syn-text-secondary transition-colors;
+    position: relative;
+  }
+  .btn-secondary::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 300ms ease-out;
+  }
+  .btn-secondary:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+  .btn-ghost {
+    @apply font-mono cursor-pointer border border-black/20 text-[11px] tracking-[0.25em] text-syn-text transition-colors duration-300 hover:border-syn-cyan hover:text-syn-cyan;
+  }
+  .split-heading {
+    @apply overflow-hidden;
+  }
+  .split-heading-line {
+    @apply block overflow-hidden;
+  }
+  .split-heading-word {
+    @apply inline-block translate-y-full opacity-0 transition-all duration-700 ease-out;
+  }
+  .split-heading-word.visible {
+    @apply translate-y-0 opacity-100;
+  }
+  .status-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-syn-cyan;
+  }
+  .hero-fade {
+    @apply opacity-0 animate-fade-in;
+  }
+  .evolution-item {
+    @apply flex gap-6;
+  }
+  .evolution-arrow {
+    @apply font-mono shrink-0 text-[11px] tracking-[0.15em] text-syn-text-muted opacity-0 group-hover:opacity-100 transition-opacity;
+  }
+  .signal-row {
+    @apply flex flex-col gap-2 flex-1 min-w-[180px];
+  }
+  .research-cell {
+    @apply relative overflow-hidden rounded-xl border border-black/[0.07] bg-syn-surface/60 p-8 transition-all duration-500 hover:-translate-y-2 hover:border-syn-cyan/40 hover:bg-syn-surface;
+    min-height: 240px;
+  }
+  .infinity-flow-text {
+    @apply relative pl-12;
+  }
+  .skip-link {
+    @apply absolute -top-10 left-4 font-mono text-xs bg-syn-text text-white px-4 py-2 z-50 transition-all duration-200 focus:top-4;
   }
 }
 
-.animate-pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-/* GSAP ScrollTrigger smooth pinning */
-.gsap-pin-spacer {
-  pointer-events: none;
-}
-
-/* Smooth text reveal clip-path */
-.split-line,
-.split-word,
-.split-char {
-  will-change: transform, opacity, clip-path;
-}
-
-/* Magnetic button smooth transform */
-.magnetic-element {
-  will-change: transform;
-}
-
-/* Horizontal carousel smooth scroll */
-.carousel-track {
-  scroll-behavior: auto;
-}
-
-/* Focus visible for accessibility */
-*:focus-visible {
-  outline: 2px solid var(--syn-cyan);
-  outline-offset: 3px;
-  border-radius: 4px;
-}
-
-/* SplitHeading mask reveal */
-.st-mask {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: bottom;
-}
-.st-mask .st-line {
-  display: inline-block;
-  will-change: transform;
-}
-div.st-mask { display: block; }
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+  .animation-delay-700 {
+    animation-delay: 700ms;
+  }
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
   }
 }
-
-/* React Bits overrides for brand */
-.tech-text canvas { display: block; }
