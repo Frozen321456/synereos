@@ -275,6 +275,20 @@ export const footer = {
   motto: 'EXPERIMENT OVER ASSUMPTION.',
 };
 
+
+export const beyondContext = {
+  badge: 'ARCHITECTURE / PERSISTENT STATE / NO FIXED WINDOW',
+  title: 'Beyond the Context Window',
+  intro: 'Intelligence is not defined by how many tokens fit inside a window. HEXIM maintains persistent internal state, memory, and experience that transcend a single inference context.',
+  pillars: [
+    { icon: '🧠', title: 'Persistent Internal State', desc: 'Model state evolves across interactions — not reset per request.' },
+    { icon: '📚', title: 'Episodic + Semantic Memory', desc: 'Experiences consolidate into long-term knowledge, accessible without context-window limits.' },
+    { icon: '↺', title: 'Continuous Adaptation', desc: 'Each outcome updates the system. Learning happens at inference time, not only during training.' },
+    { icon: '🎯', title: 'Goal-Directed Reasoning', desc: 'Planning operates over extended horizons, not single-turn completions.' },
+  ],
+  contrast: 'Traditional LLM architectures bound intelligence to a fixed context window. HEXIM replaces that abstraction with persistent, evolving state — the architecture of an agent, not a completion engine.',
+};
+
 export const homeContent = {
   hero,
   question,
@@ -288,6 +302,7 @@ export const homeContent = {
   timeline,
   applications,
   philosophy,
+  beyondContext,
   footer,
 };
 

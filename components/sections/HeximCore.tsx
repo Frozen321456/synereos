@@ -1,6 +1,8 @@
 'use client';
 
 import { homeContent } from '@/content/home';
+import { Pin } from '../ui/PageShell';
+import { useRef, useEffect } from 'react';
 
 export function HeximCore() {
   const { heximCore } = homeContent;
@@ -48,7 +50,12 @@ export function HeximCore() {
           <p className="mono mb-8 text-[11px] tracking-[0.35em] text-syn-text-muted">
             EXPERIENCE LOOP
           </p>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Pin start="top top" end="+200%" pin pinSpacing scrub={1}>
+            <div className="h-[80vh] flex items-center justify-center">
+              <ExperienceLoopVisual stages={heximCore.loop.stages} />
+            </div>
+          </Pin>
+          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {heximCore.loop.stages.map((stage, i) => (
               <div
                 key={stage.label}
@@ -93,5 +100,116 @@ export function HeximCore() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ---------- Experience Loop Visual (GSAP ScrollTrigger) ---------- */
+
+function ExperienceLoopVisual({ stages }: { stages: typeof homeContent.heximCore.loop.stages }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+
+  // Set up canvas and context once
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctxRef.current = ctx;
+  }, []);
+
+  // Set up and tear down the GSAP animation
+  useEffect(() => {
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+
+    let cleanup: (() => void) | null = null;
+
+    import('gsap').then(({ default: gsap }) => {
+      import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
+        // Double-check that ctx is still not null (though it should be)
+        if (!ctxRef.current) return;
+        const ctx = ctxRef.current;
+        const width = ctx.canvas.width;
+        const height = ctx.canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) * 0.35;
+
+        function drawLoop(progress: number) {
+          ctx.clearRect(0, 0, width, height);
+
+          // Draw circular path
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(2,132,199,0.15)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Draw progress arc
+          const startAngle = -Math.PI / 2;
+          const endAngle = startAngle + progress * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+          ctx.strokeStyle = '#0284C7';
+          ctx.lineWidth = 3;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          // Draw stage nodes
+          stages.forEach((stage, i) => {
+            const angle = startAngle + (i / stages.length) * Math.PI * 2;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            const isActive = (i / stages.length) < progress || (progress === 1 && i === stages.length - 1);
+
+            ctx.beginPath();
+            ctx.arc(x, y, isActive ? 12 : 8, 0, Math.PI * 2);
+            ctx.fillStyle = isActive ? '#0284C7' : 'rgba(2,132,199,0.3)';
+            ctx.fill();
+
+            if (isActive) {
+              ctx.font = '11px "JetBrains Mono"';
+              ctx.fillStyle = '#0A0F1E';
+              ctx.textAlign = 'center';
+              ctx.fillText(stage.label, x, y - 20);
+            }
+          });
+        }
+
+        drawLoop(0);
+
+        const anim = gsap.to({ progress: 0 }, {
+          progress: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: ctx.canvas.parentElement,
+            start: 'top top',
+            end: '+200%',
+            scrub: 1,
+            onUpdate: self => drawLoop(self.progress),
+          },
+        });
+
+        cleanup = () => {
+          anim.kill();
+          ScrollTrigger.getAll().forEach(st => st.kill());
+        };
+      });
+    });
+
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [stages]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={800}
+      height={500}
+      className="w-full max-w-[800px] h-auto"
+      aria-hidden="true"
+    />
   );
 }
