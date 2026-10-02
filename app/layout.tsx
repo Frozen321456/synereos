@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { GSAPProvider } from '@/components/ui/PageShell';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -91,7 +92,7 @@ export default function RootLayout({
         <a href="#main" className="skip-link mono text-xs">
           SKIP TO CONTENT
         </a>
-        {children}
+        <GSAPProvider>{children}</GSAPProvider>
       </body>
     </html>
   );

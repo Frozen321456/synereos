@@ -291,3 +291,128 @@ export function StatusLine({ items }: { items: { icon: string; tone: string; tex
     </div>
   );
 }
+
+
+/* ---------- GSAP Provider (client-side only) ---------- */
+
+export function GSAPProvider({ children }: { children: ReactNode }) {
+  let ctx: { revert: () => void } | null = null;
+
+  useEffect(() => {
+    import("gsap").then(({ default: gsap }) => {
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger);
+        ctx = gsap.context(() => {});
+      });
+    });
+    return () => {
+      ctx?.revert();
+      ctx = null;
+    };
+  }, []);
+
+  return <>{children}</>;
+}
+
+/* ---------- Pin: sticky section with scrub ---------- */
+
+export function Pin({
+  children,
+  start = "top top",
+  end = "+=100%",
+  pin = true,
+  pinSpacing = true,
+  scrub = 1,
+  className = "",
+}: {
+  children: ReactNode;
+  start?: string;
+  end?: string;
+  pin?: boolean;
+  pinSpacing?: boolean;
+  scrub?: number | boolean;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    import("gsap").then(({ default: gsap }) => {
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        const st = ScrollTrigger.create({
+          trigger: el,
+          start,
+          end,
+          pin,
+          pinSpacing,
+          scrub,
+        });
+        return () => st.kill();
+      });
+    });
+  }, [start, end, pin, pinSpacing, scrub]);
+
+  return <div ref={ref} className={className}>{children}</div>;
+}
+
+/* ---------- ScrubText: text reveal tied to scroll ---------- */
+
+export function ScrubText({
+  lines,
+  start = "top center",
+  end = "bottom center",
+  scrub = 1,
+  className = "",
+}: {
+  lines: string[];
+  start?: string;
+  end?: string;
+  scrub?: number | boolean;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    import("gsap").then(({ default: gsap }) => {
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        const items = el.querySelectorAll("[data-scrub]");
+        items.forEach((item, i) => {
+          gsap.fromTo(
+            item,
+            { opacity: 0, y: 40 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: el,
+                start,
+                end,
+                scrub,
+              },
+            }
+          );
+        });
+      });
+    });
+  }, [start, end, scrub]);
+
+  return (
+    <div ref={ref} className={`space-y-8 ${className}`}>
+      {lines.map((line, i) => (
+        <div key={i} data-scrub className="overflow-hidden">
+          <span className="block text-[clamp(2rem,4vw,3.5rem)] font-semibold leading-[1.02] tracking-[-0.03em] text-syn-text">
+            {line}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+

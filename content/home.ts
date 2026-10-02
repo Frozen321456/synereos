@@ -7,7 +7,7 @@ export const hero = {
     "it experiences, predicts,",
     "tests and adapts.",
   ],
-  subtext: 'Synereos is an independent AI research lab exploring new approaches to efficient, adaptive and experiential machine intelligence. Home of HEXIM.',
+  subtext: 'Independent AI research into architectures that learn, remember, reason and evolve through experience. Home of HEXIM.',
   cta: {
     primary: { label: 'Explore HEXIM', href: '/hexim' },
     secondary: { label: 'Enter the Research Lab', href: '/research' },
@@ -27,15 +27,17 @@ export const hero = {
 
 export const question = {
   badge: 'THE QUESTION',
-  headline: "What if intelligence isn't just about having more parameters?",
-  intro: 'Current AI systems can scale dramatically, but Synereos investigates another question:',
-  questions: [
-    { number: '01', text: 'How can intelligence become more efficient?' },
-    { number: '02', text: 'How can a model retain useful computation under extreme representation constraints?' },
-    { number: '03', text: 'How can a model learn from experience?' },
-    { number: '04', text: 'How can it build and update an internal understanding of the world?' },
-    { number: '05', text: 'How can one model move beyond static inference?' },
+  assumption: 'More parameters → more capability.',
+  turn: "But what happens when scaling isn't the answer?",
+  chain: [
+    { step: 'Representation', text: 'Can useful computation survive extreme representation constraints?' },
+    { step: 'Memory', text: 'Can a model retain what mattered, across long horizons?' },
+    { step: 'Experience', text: 'Can it learn from outcomes — not just labels?' },
+    { step: 'World models', text: 'Can it build and update an internal understanding of the world?' },
+    { step: 'Autonomous discovery', text: 'Can it generate and test its own hypotheses?' },
+    { step: 'Beyond static inference', text: 'Can one model stop merely answering — and start adapting?' },
   ],
+  close: 'A different model of intelligence.',
   bridge: 'This is where HEXIM begins.',
 };
 
