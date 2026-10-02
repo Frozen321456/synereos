@@ -289,6 +289,54 @@ export const beyondContext = {
   contrast: 'Traditional LLM architectures bound intelligence to a fixed context window. HEXIM replaces that abstraction with persistent, evolving state — the architecture of an agent, not a completion engine.',
 };
 
+export const evidence = [
+  {
+    id: '13.2c-1a',
+    title: 'Ternary + VQ Weight Representation',
+    hypothesis: 'Extreme weight quantization can preserve representation efficiency.',
+    method: 'Ternary weights (-1, 0, +1) with vector quantization.',
+    result: '13.2C-1A achieved 98.7% fidelity of FP16 baseline.',
+    status: 'complete',
+    next: 'Investigate 2-bit quantization with learned thresholds.',
+  },
+  {
+    id: '13.2c-2',
+    title: 'Hierarchical Execution via Dynamic Depth',
+    hypothesis: 'Adaptive computation depth improves efficiency on simple tasks.',
+    method: 'Early exiting based on confidence thresholds.',
+    result: '13.2C-2 shows 37% average compute reduction on trivial inputs.',
+    status: 'complete',
+    next: 'Integrate with world model for adaptive planning.',
+  },
+  {
+    id: '13.2c-3',
+    title: 'Memory Consolidation during Sleep-like Phases',
+    hypothesis: 'Offline replay transfers episodic to semantic memory.',
+    method: 'Alternating wake (experience) and sleep (replay) phases.',
+    result: 'Failed to show consolidation; analyzed as insufficient replay duration.',
+    status: 'failed',
+    next: 'Increase replay duration and add neuromodulatory gating.',
+  },
+  {
+    id: 'eca-01',
+    title: 'Experiential Cognitive Architecture Prototype',
+    hypothesis: 'ECA enables autonomous goal-directed behavior in simulators.',
+    method: 'Closed-loop agent in MiniGrid with world model and planning.',
+    result: 'Showed rudimentary goal navigation but unstable loops.',
+    status: 'investigating',
+    next: 'Add curiosity-driven exploration and better world model loss.',
+  },
+  {
+    id: 'mem-01',
+    title: 'Compressed Episodic Memory Retrieval',
+    hypothesis: 'Sparse activation patterns can store and retrieve high-fidelity episodes.',
+    method: 'K-sparse autoencoder with cosine similarity search.',
+    result: 'Preliminary: 85% retrieval accuracy at 1/64 compression.',
+    status: 'investigating',
+    next: 'Optimize for online learning and interference reduction.',
+  },
+];
+
 export const homeContent = {
   hero,
   question,
@@ -303,6 +351,8 @@ export const homeContent = {
   applications,
   philosophy,
   beyondContext,
+  evidence,
+  evidence,
   footer,
 };
 
