@@ -352,7 +352,6 @@ export const homeContent = {
   philosophy,
   beyondContext,
   evidence,
-  evidence,
   footer,
 };
 
