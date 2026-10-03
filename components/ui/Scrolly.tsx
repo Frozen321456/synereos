@@ -403,3 +403,32 @@ export function MagneticButton({
     </a>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* useGsap — useGSAP-style hook: dynamic import + auto cleanup         */
+/* ------------------------------------------------------------------ */
+
+export function useGsap(
+  container: React.RefObject<HTMLElement | null>,
+  setup: (gsap: typeof import("gsap").default, ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger) => void,
+  deps: unknown[] = []
+) {
+  useEffect(() => {
+    let disposed = false;
+    let ctx: { revert: () => void } | null = null;
+
+    import("gsap").then(({ default: gsap }) => {
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        if (disposed) return;
+        gsap.registerPlugin(ScrollTrigger);
+        ctx = gsap.context(() => setup(gsap, ScrollTrigger));
+      });
+    });
+
+    return () => {
+      disposed = true;
+      ctx?.revert();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [container, ...deps]);
+}

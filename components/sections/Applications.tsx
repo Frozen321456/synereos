@@ -1,13 +1,53 @@
-'use client';
+"use client";
 
-import { homeContent } from '@/content/home';
+import { useRef } from "react";
+import { homeContent } from "@/content/home";
+import { useGsap } from "@/components/ui/Scrolly";
 
 export function Applications() {
   const { applications } = homeContent;
+  const container = useRef<HTMLElement>(null);
+
+  useGsap(container, (gsap) => {
+    const root = container.current;
+    if (!root) return;
+
+    // Asymmetric stagger pop: alternating scales + opacity, uneven rhythm —
+    // deliberately breaks uniform card-grid feel
+    gsap.fromTo(
+      "[data-app-cell]",
+      { opacity: 0, scale: 0.94 },
+      {
+        opacity: 1,
+        scale: 1,
+        stagger: { each: 0.12, from: "start", grid: "auto" },
+        duration: 0.7,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: "[data-app-grid]",
+          start: "top 85%",
+          toggleActions: "play none none none",
+        },
+      }
+    );
+
+    // Every third cell drifts slower than its neighbors — parallax depth
+    gsap.to("[data-app-cell='odd']", {
+      yPercent: -6,
+      ease: "none",
+      scrollTrigger: {
+        trigger: root,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 0.8,
+      },
+    });
+  });
 
   return (
     <section
       id="applications"
+      ref={container}
       className="syn-section hairline-t"
       aria-labelledby="applications-heading"
     >
@@ -24,19 +64,49 @@ export function Applications() {
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-syn-text-secondary">
           {applications.intro}
         </p>
-        <div className="mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+        {/* Deliberately uneven wall — alternating optical scales, no uniform hover */}
+        <div data-app-grid className="mt-20 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {applications.domains.map((domain, i) => (
             <article
-              key={i}
-              className="group relative p-8 rounded-xl border border-black/[0.07] bg-syn-surface/60 transition-all duration-500 hover:-translate-y-1 hover:border-syn-cyan/40 hover:bg-syn-surface"
+              key={domain.title}
+              data-app-cell={i % 2 === 0 ? "even" : "odd"}
+              className="relative will-change-transform"
             >
-              <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-3xl">{domain.icon}</span>
-                <h3 className="text-xl font-medium tracking-tight text-syn-text group-hover:text-syn-cyan transition-colors">
+              <div
+                aria-hidden="true"
+                className={`absolute -inset-x-4 -inset-y-6 -z-10 rounded-2xl ${
+                  i % 3 === 2
+                    ? "opacity-100"
+                    : "opacity-0"
+                }`}
+                style={
+                  i % 3 === 2
+                    ? {
+                        background:
+                          "radial-gradient(ellipse 80% 70% at 70% 0%, rgba(67,56,202,0.05), transparent 70%)",
+                      }
+                    : undefined
+                }
+              />
+              <div className="flex items-baseline gap-4">
+                <span
+                  className={
+                    i % 2 === 0 ? "text-5xl leading-none" : "text-3xl leading-none"
+                  }
+                  aria-hidden="true"
+                >
+                  {domain.icon}
+                </span>
+                <h3 className="text-xl font-medium tracking-tight text-syn-text">
                   {domain.title}
                 </h3>
               </div>
-              <p className="text-base leading-relaxed text-syn-text-secondary">
+              <span
+                aria-hidden="true"
+                className="mt-6 block h-px w-1/3 bg-black/[0.1]"
+              />
+              <p className="mt-4 text-base leading-relaxed text-syn-text-secondary">
                 {domain.desc}
               </p>
             </article>

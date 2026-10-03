@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import Lenis from 'lenis';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 /* ---------- Navbar (shared) ---------- */
 
@@ -96,29 +98,49 @@ export function Navbar() {
   );
 }
 
-/* ---------- SmoothScroll (Lenis) ---------- */
+/* ---------- SmoothScroll (Lenis + ScrollTrigger sync) ---------- */
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
-    let lenis: { raf: (t: number) => void; destroy: () => void } | null = null;
+    let lenis: Lenis | null = null;
     let rafId = 0;
     let cancelled = false;
+    let tickerFn: ((time: number) => void) | null = null;
 
-    import('lenis')
-      .then(({ default: Lenis }) => {
-        if (cancelled) return;
-        lenis = new Lenis({ duration: 1.1, smoothWheel: true });
-        const raf = (time: number) => {
-          lenis?.raf(time);
-          rafId = requestAnimationFrame(raf);
-        };
+    const setup = async () => {
+      if (cancelled) return;
+      const gsapMod = await import('gsap');
+      const gsap = gsapMod.default;
+      gsap.registerPlugin(ScrollTrigger);
+      lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+
+      // Lenis drives ScrollTrigger so pinned sections track smooth scroll
+      lenis.on('scroll', ScrollTrigger.update);
+
+      const raf = (time: number) => {
+        lenis?.raf(time);
         rafId = requestAnimationFrame(raf);
-      })
-      .catch(() => {}); // graceful: fall back to native scroll
+      };
+      rafId = requestAnimationFrame(raf);
+
+      // GSAP ticker drives Lenis (canonical pattern)
+      tickerFn = (time: number) => {
+        lenis?.raf(time * 1000);
+      };
+      gsapMod.default.ticker.add(tickerFn);
+      gsapMod.default.ticker.lagSmoothing(0);
+    };
+
+    setup().catch(() => {}); // graceful: fall back to native scroll
 
     return () => {
       cancelled = true;
       cancelAnimationFrame(rafId);
+      if (tickerFn) {
+        import('gsap').then(({ default: gsap }) => {
+          gsap.ticker.remove(tickerFn as (time: number) => void);
+        });
+      }
       lenis?.destroy();
     };
   }, []);
