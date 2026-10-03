@@ -5,6 +5,8 @@ export { HeximIntro } from './HeximIntro';
 export { HeximCore } from './HeximCore';
 export { HeximArchitecture } from './HeximArchitecture';
 export { UnifiedModel } from './UnifiedModel';
+export { BeyondContext } from './BeyondContext';
+export { EvidenceSection } from './EvidenceSection';
 export { HeximInfinity } from './HeximInfinity';
 export { FourGates } from './FourGates';
 export { Timeline } from './Timeline';

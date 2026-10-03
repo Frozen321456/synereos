@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { homeContent } from '@/content/home';
+import { TextScrubReveal, MagneticButton } from '@/components/ui/Scrolly';
 import { designTokens } from '@/content/design';
 
 const { colors } = designTokens;
@@ -178,27 +179,22 @@ export function Hero() {
         <p className="mono hero-fade text-[11px] tracking-[0.35em] text-syn-cyan animation-delay-100">
           {hero.badge}
         </p>
-        <h1
-          id="hero-heading"
-          className="mt-8 max-w-5xl text-[clamp(2.75rem,7vw,7rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-syn-text hero-fade animation-delay-200"
-          aria-label={hero.headline.join(' ')}
-        >
-          {hero.headline.map((line, i) => (
-            <span key={i} className="block">
-              {line}
-            </span>
-          ))}
-        </h1>
+        <TextScrubReveal
+          lines={hero.headline}
+          className="hero-fade animation-delay-200"
+          lineClassName="mt-8 max-w-5xl text-[clamp(2.75rem,7vw,7rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-syn-text"
+        />
+        <h1 id="hero-heading" className="sr-only">{hero.headline.join(' ')}</h1>
         <p className="hero-fade mt-8 max-w-xl text-lg leading-relaxed text-syn-text-secondary animation-delay-300">
           {hero.subtext}
         </p>
         <div className="hero-fade mt-10 flex flex-wrap items-center gap-6 animation-delay-400">
-          <a
+          <MagneticButton
             href={hero.cta.primary.href}
-            className="mono rounded-full bg-syn-text px-8 py-4 text-[11px] tracking-[0.25em] text-white transition-all duration-300 hover:bg-syn-cyan"
+            className="!bg-syn-text !text-white !border-syn-text hover:!bg-syn-cyan hover:!border-syn-cyan !px-8 !py-4 !tracking-[0.25em]"
           >
             {hero.cta.primary.label}
-          </a>
+          </MagneticButton>
           <a
             href={hero.cta.secondary.href}
             className="mono link-line text-[11px] tracking-[0.25em] text-syn-text-secondary transition-colors hover:text-syn-text"

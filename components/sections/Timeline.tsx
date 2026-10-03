@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { homeContent } from '@/content/home';
+import { homeContent } from "@/content/home";
+import { HorizontalPanels } from "@/components/ui/Scrolly";
 
 export function Timeline() {
   const { timeline } = homeContent;
@@ -11,7 +12,7 @@ export function Timeline() {
       className="syn-section hairline-t"
       aria-labelledby="timeline-heading"
     >
-      <div className="container-syn py-28 lg:py-40">
+      <div className="container-syn pt-28 lg:pt-40">
         <p className="mono mb-8 text-[11px] tracking-[0.35em] text-syn-text-muted">
           {timeline.badge}
         </p>
@@ -21,31 +22,38 @@ export function Timeline() {
         >
           Timeline
         </h2>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-syn-text-secondary">
-          {timeline.intro}
+        <p className="mb-16 mt-6 max-w-2xl text-lg leading-relaxed text-syn-text-secondary">
+          {timeline.intro} — scroll down to travel through the research years.
         </p>
-        <div className="mt-20 space-y-12">
-          {timeline.milestones.map((milestone) => (
-            <div key={milestone.year} className="relative pl-16">
-              <div className="absolute left-4 top-0 w-px h-full bg-black/[0.06]" />
-              <div className="absolute left-0 top-0 w-8 h-8 rounded-full border-2 border-syn-cyan bg-syn-bg flex items-center justify-center">
-                <span className="mono text-[10px] tracking-[0.2em] text-syn-cyan">{milestone.year}</span>
-              </div>
-              <div className="mb-2">
-                <span className="mono text-[10px] tracking-[0.3em] text-syn-text-muted">{milestone.phase}</span>
-              </div>
-              <ul className="space-y-2">
-                {milestone.items.map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-base text-syn-text-secondary">
-                    <span className="w-2 h-2 rounded-full bg-syn-cyan/40 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
       </div>
+
+      {/* Vertical scroll drives horizontal era panels */}
+      <HorizontalPanels className="h-[70vh] w-full">
+        {timeline.milestones.map((milestone) => (
+          <article
+            key={milestone.year}
+            className="flex h-full w-[85vw] max-w-[720px] flex-col justify-center border-l border-black/[0.06] px-8 lg:w-[60vw] lg:px-16"
+          >
+            <span className="mono text-[clamp(3rem,8vw,6rem)] leading-none font-semibold tracking-tight text-black/[0.08]">
+              {milestone.year}
+            </span>
+            <span className="mono mt-2 text-[10px] tracking-[0.3em] text-syn-cyan">
+              {milestone.phase.toUpperCase()}
+            </span>
+            <ul className="mt-6 space-y-3">
+              {milestone.items.map((item, i) => (
+                <li
+                  key={i}
+                  className="flex items-center gap-3 text-base text-syn-text-secondary"
+                >
+                  <span className="h-2 w-2 flex-shrink-0 rounded-full bg-syn-cyan/40" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </HorizontalPanels>
     </section>
   );
 }
